@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>prisma_rover_navigation</name>
+  <version>0.0.0</version>
+  <description>Navigation and SLAM package for Prisma Rover using Nav2 and SLAM Toolbox</description>
+  <maintainer email="user@todo.todo">user</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>nav2_common</depend>
+  <depend>nav2_lifecycle_manager</depend>
+  <depend>nav2_controller</depend>
+  <depend>nav2_planner</depend>
+  <depend>nav2_behaviors</depend>
+  <depend>nav2_bt_navigator</depend>
+  <depend>nav2_waypoint_follower</depend>
+  <depend>nav2_velocity_smoother</depend>
+  <depend>nav2_smoother</depend>
+  <depend>slam_toolbox</depend>
+  <depend>teb_local_planner</depend>
+  <depend>costmap_converter</depend>
+  <depend>prisma_rover_interfaces</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

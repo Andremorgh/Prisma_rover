@@ -1,0 +1,421 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="Test_World">
+      <!-- <plugin 
+    filename="libgz-sim-clock-publisher-system.so"
+    name="gz::sim::systems::ClockPublisher">
+    <publish_frequency>100</publish_frequency>  
+  </plugin> -->
+    <physics name='default_physics' default='0' type='ode'>
+      <gravity>0 0 -9.8066</gravity>
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>50</iters>
+          <sor>1.3</sor>
+          <use_dynamic_moi_rescaling>0</use_dynamic_moi_rescaling>
+        </solver>
+        <constraints>
+          <cfm>0</cfm>
+          <erp>0.2</erp>
+          <contact_max_correcting_vel>100</contact_max_correcting_vel>
+          <contact_surface_layer>0.001</contact_surface_layer>
+        </constraints>
+      </ode>
+      <max_step_size>0.003</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>333</real_time_update_rate>
+      <magnetic_field>6.0e-6 2.3e-5 -4.2e-5</magnetic_field>
+    </physics>
+
+    <light type="directional" name="sun">
+      <cast_shadows>false</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+    
+    <gui fullscreen='0'>
+      
+      <plugin filename="GzScene3D" name="3D View">
+        <ignition-gui>
+          <title>3D View</title>
+          <property type="bool" key="show_titlebar">false</property>
+          <property type="string" key="state">docked</property>
+        </ignition-gui>
+        <engine>ogre2</engine>
+        <scene>scene</scene>
+        <ambient_light>0.4 0.4 0.4</ambient_light>
+        <background_color>0.8 0.8 0.8</background_color>
+        
+        <camera_pose>3 0 8 0 1.5707 0</camera_pose>
+      </plugin>
+
+      <plugin filename="WorldControl" name="World control">
+        <ignition-gui>
+          <title>World control</title>
+          <property type="bool" key="show_titlebar">false</property>
+          <property type="bool" key="resizable">false</property>
+          <property type="double" key="height">72</property>
+          <property type="double" key="width">121</property>
+          <property type="double" key="z">1</property>
+          <property type="string" key="state">floating</property>
+          <anchors target="3D View">
+            <line own="left" target="left"/>
+            <line own="bottom" target="bottom"/>
+          </anchors>
+        </ignition-gui>
+        <play_pause>true</play_pause>
+        <step>true</step>
+        <start_paused>true</start_paused>
+      </plugin>
+
+      <plugin filename="EntityTree" name="Entity Tree">
+        <ignition-gui>
+          <title>Entity Tree</title>
+        </ignition-gui>
+      </plugin>
+
+      <plugin filename="ComponentInspector" name="Component Inspector">
+        <ignition-gui>
+          <title>Component Inspector</title>
+        </ignition-gui>
+      </plugin>
+
+    </gui>
+    <!-- Walls around the area -->
+    <model name='walls_10x10_center'>
+      <pose>3 0 0 0 0 0</pose> 
+      <static>true</static>
+
+      <link name='wall_north'>
+        <pose>0 5.1 1.25 0 0 0</pose> 
+        <collision name='col_north'>
+          <geometry>
+            <box><size>10.4 0.2 2.5</size></box> </geometry>
+        </collision>
+        <visual name='vis_north'>
+          <geometry>
+            <box><size>10.4 0.2 2.5</size></box>
+          </geometry>
+          <material>
+            <ambient>0.1 0.1 0.1 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+            <specular>0.4 0.4 0.4 1</specular>
+          </material>
+        </visual>
+      </link>
+
+      <link name='wall_south'>
+        <pose>0 -5.1 1.25 0 0 0</pose>
+        <collision name='col_south'>
+          <geometry>
+            <box><size>10.4 0.2 2.5</size></box>
+          </geometry>
+        </collision>
+        <visual name='vis_south'>
+          <geometry>
+            <box><size>10.4 0.2 2.5</size></box>
+          </geometry>
+          <material>
+            <ambient>0.1 0.1 0.1 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+            <specular>0.4 0.4 0.4 1</specular>
+          </material>
+        </visual>
+      </link>
+
+      <link name='wall_east'>
+        <pose>5.1 0 1.25 0 0 0</pose> 
+        <collision name='col_east'>
+          <geometry>
+            <box><size>0.2 10.0 2.5</size></box> </geometry>
+        </collision>
+        <visual name='vis_east'>
+          <geometry>
+            <box><size>0.2 10.0 2.5</size></box>
+          </geometry>
+          <material>
+            <ambient>0.1 0.1 0.1 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+            <specular>0.4 0.4 0.4 1</specular>
+          </material>
+        </visual>
+      </link>
+
+      <link name='wall_west'>
+        <pose>-5.1 0 1.25 0 0 0</pose>
+        <collision name='col_west'>
+          <geometry>
+            <box><size>0.2 10.0 2.5</size></box>
+          </geometry>
+        </collision>
+        <visual name='vis_west'>
+          <geometry>
+            <box><size>0.2 10.0 2.5</size></box>
+          </geometry>
+          <material>
+            <ambient>0.1 0.1 0.1 1</ambient>
+            <diffuse>0 0 0 1</diffuse>
+            <specular>0.4 0.4 0.4 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+    
+     <!-- Ground Plane -->
+    <include>
+      <uri>
+      https://fuel.gazebosim.org/1.0/OpenRobotics/models/Ground Plane
+      </uri>
+    </include>
+
+     <!-- Floor Crosses -->
+    <model name='floor_crosses'>
+      <static>true</static>
+      <pose>0 0 0.005 0 0 0</pose>
+
+      <link name='cross_R'>
+        <pose>0 0 0 0 0 0.785</pose>
+        <visual name='vis_h'>
+          <geometry><box><size>0.5 0.1 0.001</size></box></geometry>
+          <material><ambient>1 0 0 1</ambient><diffuse>1 0 0 1</diffuse></material>
+        </visual>
+        <visual name='vis_v'>
+          <pose>0 0 0 0 0 1.57</pose>
+          <geometry><box><size>0.5 0.1 0.001</size></box></geometry>
+          <material><ambient>1 0 0 1</ambient><diffuse>1 0 0 1</diffuse></material>
+        </visual>
+      </link>
+
+      <link name='cross_G'>
+        <pose>3.5 -2.5 0 0 0 0.785</pose>
+        <visual name='vis_h'>
+          <geometry><box><size>0.5 0.1 0.001</size></box></geometry>
+          <material><ambient>0 1 0 1</ambient><diffuse>0 1 0 1</diffuse></material>
+        </visual>
+        <visual name='vis_v'>
+          <pose>0 0 0 0 0 1.57</pose>
+          <geometry><box><size>0.5 0.1 0.001</size></box></geometry>
+          <material><ambient>0 1 0 1</ambient><diffuse>0 1 0 1</diffuse></material>
+        </visual>
+      </link>
+
+      <link name='cross_B'>
+        <pose>2 3 0 0 0 0.785</pose>
+        <visual name='vis_h'>
+          <geometry><box><size>0.5 0.1 0.001</size></box></geometry>
+          <material><ambient>0 0 1 1</ambient><diffuse>0 0 1 1</diffuse></material>
+        </visual>
+        <visual name='vis_v'>
+          <pose>0 0 0 0 0 1.57</pose>
+          <geometry><box><size>0.5 0.1 0.001</size></box></geometry>
+          <material><ambient>0 0 1 1</ambient><diffuse>0 0 1 1</diffuse></material>
+        </visual>
+      </link>
+
+      <link name='cross_Y'>
+        <pose>5 0 0 0 0 0.785</pose>
+        <visual name='vis_h'>
+          <geometry><box><size>0.5 0.1 0.001</size></box></geometry>
+          <material><ambient>1 1 0 1</ambient><diffuse>1 1 0 1</diffuse></material>
+        </visual>
+        <visual name='vis_v'>
+          <pose>0 0 0 0 0 1.57</pose>
+          <geometry><box><size>0.5 0.1 0.001</size></box></geometry>
+          <material><ambient>1 1 0 1</ambient><diffuse>1 1 0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    
+      <!-- cylinder forest -->
+    <model name='cylinder_forest_irregular'>
+      <pose>2 0 0.5 0 0 -1.57</pose> 
+      <static>true</static>
+
+      <link name='c1'>
+        <pose>0 0 0 0 0 0</pose>
+        <collision name='col'>
+          <geometry><cylinder><radius>0.15</radius><length>1</length></cylinder></geometry>
+        </collision>
+        <visual name='vis'>
+          <geometry><cylinder><radius>0.15</radius><length>1</length></cylinder></geometry>
+          <material><ambient>0 0 1 1</ambient><diffuse>0 0 1 1</diffuse></material>
+        </visual>
+      </link>
+
+      <link name='c2'>
+        <pose>1.8 0.4 0 0 0 0</pose>
+        <collision name='col'>
+          <geometry><cylinder><radius>0.15</radius><length>1</length></cylinder></geometry>
+        </collision>
+        <visual name='vis'>
+          <geometry><cylinder><radius>0.15</radius><length>1</length></cylinder></geometry>
+          <material><ambient>0 0 1 1</ambient><diffuse>0 0 1 1</diffuse></material>
+        </visual>
+      </link>
+
+      <link name='c3'>
+        <pose>-0.5 2.2 0 0 0 0</pose>
+        <collision name='col'>
+          <geometry><cylinder><radius>0.15</radius><length>1</length></cylinder></geometry>
+        </collision>
+        <visual name='vis'>
+          <geometry><cylinder><radius>0.15</radius><length>1</length></cylinder></geometry>
+          <material><ambient>0 0 1 1</ambient><diffuse>0 0 1 1</diffuse></material>
+        </visual>
+      </link>
+
+      <link name='c4'>
+        <pose>2.1 2.5 0 0 0 0</pose>
+        <collision name='col'>
+          <geometry><cylinder><radius>0.15</radius><length>1</length></cylinder></geometry>
+        </collision>
+        <visual name='vis'>
+          <geometry><cylinder><radius>0.15</radius><length>1</length></cylinder></geometry>
+          <material><ambient>0 0 1 1</ambient><diffuse>0 0 1 1</diffuse></material>
+        </visual>
+      </link>
+
+      <link name='c5'>
+        <pose>-1.2 0.8 0 0 0 0</pose>
+        <collision name='col'>
+          <geometry><cylinder><radius>0.15</radius><length>1</length></cylinder></geometry>
+        </collision>
+        <visual name='vis'>
+          <geometry><cylinder><radius>0.15</radius><length>1</length></cylinder></geometry>
+          <material><ambient>0 0 1 1</ambient><diffuse>0 0 1 1</diffuse></material>
+        </visual>
+      </link>
+
+      <link name='c6'>
+        <pose>0.9 -1.1 0 0 0 0</pose>
+        <collision name='col'>
+          <geometry><cylinder><radius>0.15</radius><length>1</length></cylinder></geometry>
+        </collision>
+        <visual name='vis'>
+          <geometry><cylinder><radius>0.15</radius><length>1</length></cylinder></geometry>
+          <material><ambient>0 0 1 1</ambient><diffuse>0 0 1 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+
+     <!-- New Obstacles-->
+    <model name='obst_cube_large'>
+      <pose>7 0 0.5 0 0 1</pose> <static>true</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry><box><size>1 1 1</size></box></geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry><box><size>1 1 1</size></box></geometry>
+          <material>
+            <ambient>0 0 0.8 1</ambient> <diffuse>0 0 0.8 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+    
+    <model name='obst_cylinder'>
+      <pose>1 2 1.0 0 0 0</pose> <static>true</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <cylinder><radius>0.3</radius><length>2</length></cylinder>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <cylinder><radius>0.3</radius><length>2</length></cylinder>
+          </geometry>
+          <material>
+            <ambient>0.8 0 0 1</ambient> <diffuse>0.8 0 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name='obst_barrier'>
+      <pose>-1 1.5 0.25 0 0 -1.0</pose> <static>true</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry><box><size>2 0.5 1.0</size></box></geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry><box><size>2 0.5 1.0</size></box></geometry>
+          <material>
+            <ambient>0.8 0.8 0 1</ambient> <diffuse>0.8 0.8 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+
+    <!-- Static Obstacles-->
+    <include>
+      <name>U_1</name>
+      <pose> -1.5 -3.5 0.1 0 0 0 </pose>
+      <uri>model://obstacle_03</uri>
+    </include>
+
+    <include>
+      <name>U_2</name>
+      <pose> 3 -4.5 0.1 0 0 1.57 </pose>
+      <uri>model://obstacle_03</uri>
+    </include>
+
+    <include>
+      <name>Big_prisa_Y</name>
+      <pose> 3.5 2 0.1 0 0 0.5</pose>
+      <uri>model://obstacle_09</uri>
+    </include>
+
+    <include>
+      <name>Tower_C</name>
+      <pose> 5.5 -2.5 0.7 3.14 0 0</pose>
+      <uri>model://obstacle_06</uri>
+    </include>
+
+    <include>
+      <name>Tower_Y</name>
+      <pose> 15.0 -4.0 0.10 0 0 3.14159</pose>
+      <uri>model://obstacle_10_</uri>
+    </include>
+
+    <!-- Intruders -->
+    <include>
+      <name>cilinder_one</name>
+      <pose> 5.5 -1 0.1 0 0 0</pose>
+      <uri>model://intruder</uri>
+    </include>
+
+    <include>
+      <name>cilinder_two</name>
+      <pose> 6 1 0.1 0 0 0</pose>
+      <uri>model://intruder</uri>
+    </include>
+
+    <!-- AR markers -->
+    <!--include>
+      <name>tool_0_tag</name>
+      <uri>model://marker_0</uri>
+      <pose>-1 -0.5 1 0 1.57 0</pose>
+    </include-->
+
+    <plugin name='ignition::gazebo::systems::Physics' filename='ignition-gazebo-physics-system' />
+    <plugin name='ignition::gazebo::systems::UserCommands' filename='ignition-gazebo-user-commands-system' />
+    <plugin name='ignition::gazebo::systems::SceneBroadcaster' filename='ignition-gazebo-scene-broadcaster-system' />
+    <plugin name='ignition::gazebo::systems::Contact' filename='ignition-gazebo-contact-system' />
+
+
+  </world>
+</sdf>
+

@@ -1,0 +1,51 @@
+# ROS 2 build and install artifacts
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+
+# Dynamic ROS 2 workspace package filters (crucial to avoid committing profile exclusions)
+**/COLCON_IGNORE
+
+# Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ipynb_checkpoints/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local IDE and editor configurations
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.save
+.project
+.pydevproject
+.settings/
+
+# Log directories and files
+log/
+*.log
+
+# Large data, backups and trained model weights (except package-specific static models)
+Bag/
+data/
+meshes_backup/
+**/meshes_backup/
+assets/models/
+*.pt
+*.onnx
+*.pb
+*.csv
+
+ros2_ws/src/prisma_rover_description/meshes/prisma_rover.obj
+ros2_ws/src/prisma_rover_description/meshes/prisma_rover.dae
+*.obj
+*.dae

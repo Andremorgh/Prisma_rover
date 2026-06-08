@@ -1,0 +1,41 @@
+prisma_rover/rtabmap:
+  ros__parameters:
+    use_sim_time: true
+    frame_id: "prisma_rover/base_footprint"
+    odom_frame_id: "prisma_rover/odom"
+    map_frame_id: "prisma_rover/map"
+    publish_tf: true
+    
+    # Sensor subscriptions
+    subscribe_depth: false  # No RGB-D depth camera used for SLAM
+    subscribe_rgb: false    # No RGB image used for SLAM
+    subscribe_stereo: false
+    subscribe_scan: false
+    subscribe_scan_cloud: true # Subscribe to 3D PointCloud2 via scan_cloud
+    approx_sync: true       # Synchronize scans and odometry approximately (essential for asynchronous sensors)
+    queue_size: 10          # Message queue buffer size for synchronization
+    
+    # Detection rate
+    Rtabmap/DetectionRate: "2.0"
+    
+    # 2D occupancy grid generation from 3D Lidar point cloud (subscribe_scan_cloud=true)
+    # Grid/Sensor=0 (LaserScan mode) + Grid/FromDepth=false is the correct combo when
+    # using a PointCloud2 Lidar scan via scan_cloud: it treats the cloud as a laser scan
+    # projected at the scan layer height, bypassing the depth-from-RGB pipeline.
+    RGBD/CreateOccupancyGrid: "true"
+    Grid/Sensor: "0" # 0=LaserScan/PointCloud2-as-scan, 1=Depth image, 2=both
+    Grid/FromDepth: "false"
+    Grid/RangeMax: "20.0"
+    Grid/RangeMin: "0.2"
+    Grid/CellSize: "0.05"
+    Grid/MaxObstacleHeight: "1.0"
+    Grid/MinGroundHeight: "-0.1"
+    Grid/MaxGroundHeight: "0.15"
+    Grid/NormalsSegmentation: "false"
+    Grid/RayTracing: "true"
+    Grid/3D: "false"
+    
+    # SLAM & Memory optimization
+    Mem/IncrementalMemory: "true"
+    Mem/InitWMWithAllNodes: "false"
+    database_path: ""

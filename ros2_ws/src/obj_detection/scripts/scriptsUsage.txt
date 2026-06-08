@@ -1,0 +1,9 @@
+Nodes:
+
+- realsense_color_rs.py: detects objects using YOLO on the RGB image and publishes a colored point cloud with the detected objects. This is for visualization purposes only.
+
+- detect_objects_rs.py: detects objects using YOLO and publishes a custom message with object class, track ID, 3D position and relationships.
+
+- objects_map.py: receives the custom messages published from detect_objects_rs and stores all the objects detected during robot navigation. It keeps track of all objects to remove duplicates and update spatial relationships.
+
+- object_search.py: looks for a specified object and when it is detected, it defines the object frame with respect to the map and publishes it. 
