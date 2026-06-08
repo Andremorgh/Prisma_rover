@@ -114,9 +114,7 @@ The YOLO object detection agent dynamically updates and persists all detected ob
 ### Q3: How do I switch active workspace build profiles?
 You can select build profiles at runtime using the scripts `./docker_build.sh <profile>` and `./docker_run.sh <profile>`. The active profile dynamically ignores excluded packages using `COLCON_IGNORE` tags under the hood.
 
-### Q4: How do I isolate my ROS 2 network traffic and prevent local network saturation?
-By default, ROS 2 DDS uses `ROS_DOMAIN_ID=0` over multicast, meaning all computers and robots on the same local Wi-Fi or ethernet network will discover and crosstalk with each other, which can saturate the network and cause lag. To isolate your workspace, set a unique domain ID in your shell environment (e.g. between 1 and 101):
-```bash
-export ROS_DOMAIN_ID=42
-```
-Make sure this variable is exported both on your host machine and inside your Docker containers.
+### Q4: How do I prevent ROS 2 from saturating my local Wi-Fi or Ethernet network?
+By default, ROS 2 uses multicast for node discovery, which can flood your local physical network with DDS traffic and cause severe latency. To prevent this, the workspace comes configured with **Localhost Isolation** by default:
+1. Inside Docker, `docker_run.sh` sets `--env="ROS_LOCALHOST_ONLY=1"`. This confines all DDS traffic strictly to the localhost loopback interface, completely blocking external network packets.
+2. If you want to communicate with external ROS 2 nodes on your physical network, you can disable this by setting `ROS_LOCALHOST_ONLY=0`, but you should then set a unique `ROS_DOMAIN_ID` (e.g. `export ROS_DOMAIN_ID=42`) on all participating machines to avoid crosstalk and limit discovery overhead.
