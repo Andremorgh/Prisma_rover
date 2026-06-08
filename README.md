@@ -1,62 +1,116 @@
-# Prisma Rover ROS 2 Workspace
+# Prisma Rover: Autonomous Exploration & Mapping Workspace
 
-Welcome to the official repository of **Prisma Rover**, an advanced software stack based on **ROS 2 Humble** designed for autonomous navigation, reactive fuzzy obstacle avoidance, SLAM mapping (2D and 3D), and intelligent object search using Reinforcement Learning (RL).
+An advanced, modular ROS 2 Humble robotic workspace designed for autonomous 3D navigation, fuzzy obstacle avoidance, ArUco localization, and YOLO-based semantic object mapping.
 
-The entire system is Dockerized with modular build profiles to ensure maximum reproducibility on real hardware and in simulation.
-
----
-
-## 🧭 Documentation Map
-
-The project contains three main documentation files inside the `docs/` folder to guide you through development and usage:
-
-1. 📖 **[GUIDE.md](file:///home/andrea/Desktop/Quantum_obj_rover/docs/GUIDE.md)**: **Technical User Manual**. Contains detailed instructions on launch files, kinematics and EKF fusion details, 2D/3D sensor configurations, mapping modes (SLAM Toolbox / RTAB-Map), and testing/validation checklists.
-2. 🗂️ **[PROJECT_STRUCTURE.md](file:///home/andrea/Desktop/Quantum_obj_rover/docs/PROJECT_STRUCTURE.md)**: **Workspace and Node Directory**. Shows the complete file tree, the Dockerfile multi-stage build hierarchy (with ASCII and Mermaid diagrams), and a detailed list of all proprietary ROS 2 nodes with their available parameters and flags.
-3. 📝 **[changes.md](file:///home/andrea/Desktop/Quantum_obj_rover/docs/changes.md)**: **Refactoring Changelog**. Tracks the refactoring history and porting from the legacy monolithic architecture to the current modular design.
+![Prisma Rover](docs/real_rover.png)
 
 ---
 
-## ⚡ Quick Start
+## Table of Contents
+1. [Workspace Architecture](#workspace-architecture)
+2. [Docker Integration & Build Profiles](#docker-integration--build-profiles)
+3. [Installation & Build](#installation--build)
+4. [Running the Simulation](#running-the-simulation)
+5. [Package Descriptions](#package-descriptions)
+6. [Simulation Assets FAQ](#simulation-assets-faq)
 
-### 1. Prerequisites
-Ensure you have Docker installed, and optionally Nvidia Container Toolkit (if you want hardware graphics acceleration on Nvidia GPUs):
+---
+
+## Workspace Architecture
+
+The workspace is organized into modular ROS 2 packages under `ros2_ws/src/`, categorized by functionality:
+
+### 1. Core Navigation & Description
+* **`prisma_rover_description`**: Contains the URDF, physics parameters, and 3D visual CAD meshes (chassis, wheels) representing the physical rover.
+* **`prisma_rover_sim`**: Houses the Gazebo ignition worlds (`depot.sdf`, `aruco_world.sdf`, `yolo_world.sdf`), and configures topic bridges via `ros_gz_bridge`.
+* **`prisma_rover_localization`**: Configures the Extended Kalman Filter (EKF) state estimation nodes, fusing wheel odometry and IMU data.
+* **`prisma_rover_navigation`**: Coordinates SLAM Toolbox configurations and Nav2 costmap/path-planner parameters.
+* **`prisma_rover_bringup`**: Central package hosting the main orchestration launch files.
+
+### 2. Control & Exploration
+* **`prisma_rover_quantum_controller`**: Implements 2D/3D LiDAR-based fuzzy logic obstacle avoidance using look-up tables (LUT). Spreads over vectorized pointcloud processing for minimal latency.
+* **`prisma_rover_explorer`**: Handles frontier-based coverage algorithms for autonomous exploration and mapping.
+* **`prisma_rover_manager`**: High-level C++ orchestrator coordinating the transitions between localization, mapping, and exploration states.
+* **`prisma_rover_teleop`**: Keyboard and joystick teleoperation profiles.
+
+### 3. Perception & AI Mapping
+* **`prisma_rover_perception`**: Implements ArUco marker pose detection and coordinate transformations (`aruco_detector` and `aruco_pose_estimation`).
+* **`prisma_rover_obj_det_agent`**: Reinforcement learning agent that takes semantic mapping cues to steer exploration towards target search goals.
+* **`obj_detection`**: Integrates YOLO-based real-time bounding box segmentation and camera projection to locate objects in 3D coordinate space and log them into persistent storage.
+
+---
+
+## Docker Integration & Build Profiles
+
+To maintain efficiency on various target hardware, this workspace supports **Workspace Profiling** via a multi-stage Docker environment:
+
+| Profile | Included Packages | Excluded/Ignored Packages | Use Case |
+| :--- | :--- | :--- | :--- |
+| **`base`** | Navigation, Description, localization, Bringup, Sim, Teleop | `obj_detection`, `yolov11_ros2`, `prisma_rover_perception`, `prisma_rover_explorer`, `prisma_rover_obj_det_agent`, `prisma_rover_quantum_controller` | Light simulation, basic mapping |
+| **`yolo`** | Navigation, Perception (YOLO & ArUco), RL Agent, Bringup, Sim | `prisma_rover_quantum_controller` | Deep learning, visual semantic mapping |
+| **`quantum`**| Navigation, Quantum controller, Bringup, Sim, Teleop | `obj_detection`, `yolov11_ros2`, `prisma_rover_perception`, `prisma_rover_explorer`, `prisma_rover_obj_det_agent` | LiDAR-based fuzzy safety control |
+| **`full`** | All Workspace Packages | None | Full integration and training |
+
+At runtime, the `./docker_run.sh` script passes the profile to `entrypoint.sh` which dynamically injects `COLCON_IGNORE` tags in excluded folders to avoid building unnecessary dependencies.
+
+---
+
+## Installation & Build
+
+### Prerequisites
+* Docker installed on your host system
+* (Optional) NVIDIA Container Toolkit for GPU acceleration during YOLO inference
+
+### Steps
+1. Build the Docker image for a specific profile (e.g. `base` or `yolo`):
+   ```bash
+   ./docker_build.sh base
+   ```
+2. Launch the container:
+   ```bash
+   ./docker_run.sh base
+   ```
+3. Inside the container, compile the workspace:
+   ```bash
+   colcon build --symlink-install
+   ```
+
+---
+
+## Running the Simulation
+
+To launch the full Gazebo simulation along with robot localization and state publishers:
+
 ```bash
-# Initialize local permissions for X11 forwarding
-./docker_init.sh
+ros2 launch prisma_rover_bringup sim_system.launch.py profile:=base
 ```
 
-### 2. Building the Docker Image
-The Dockerfile supports 4 execution profiles. Build the desired profile by specifying it as an argument (defaults to `base`):
+For fuzzy obstacle avoidance testing (LiDAR):
 ```bash
-# Build the base profile (default)
-./docker_build.sh base
-
-# Available profiles:
-# - base    : Simulation and basic Nav2 only (lightweight)
-# - yolo    : Adds YOLOv11 and the RL agent for object search
-# - quantum : Adds the fuzzy obstacle avoidance controller
-# - full    : All packages enabled simultaneously
+ros2 launch prisma_rover_quantum_controller sim_controller.launch.py launch_sim:=true
 ```
 
-### 3. Running the Container
-Start the container associated with your compiled profile. The system automatically detects your GPU (Nvidia, AMD, Intel) and configures the X11 graphics server for RViz2 and Gazebo:
+For YOLO semantic mapping:
 ```bash
-# Run the container (defaults to base profile)
-./docker_run.sh base
-```
-*(Add `software` or `cpu` as an additional argument if you want to force Mesa software rendering on systems without a dedicated GPU).*
-
-### 4. Compilation and Running ROS 2 (inside the container)
-Once inside the container shell, compile the ROS 2 workspace:
-```bash
-# Compile active ROS 2 packages
-colcon build --symlink-install
-
-# Execute the complete simulation + EKF + SLAM + Nav2 launch
-ros2 launch prisma_rover_navigation sim_navigation.launch.py headless:=false rviz:=true
+ros2 launch prisma_rover_obj_det_agent agent.launch.py visualization:=false
 ```
 
 ---
 
-## 🛠️ Development & Support
-This stack is developed and maintained by the Prisma Lab team. For code contributions or bug reports, please refer to the guidelines described in [GUIDE.md](file:///home/andrea/Desktop/Quantum_obj_rover/docs/GUIDE.md).
+## Simulation Assets FAQ
+
+### Q1: Does the simulation work without `.obj` and `.dae` files? Can we just use the `.mtl` files?
+**No**, the simulation visual rendering will fail without `.obj` or `.dae` files:
+* **Geometry vs. Material**: The `.obj` and `.dae` files contain the actual 3D geometrical mesh (vertices, faces, and coordinates). The `.mtl` (Material Template Library) file only contains material properties (color, roughness, texture paths) applied *onto* that geometry. Without the mesh, there is no shape to color.
+* **Physics Collisions**: Physics engines use simplified geometric colliders (like cylinders for wheels and boxes for the chassis) defined in the URDF/SDF. Therefore, the robot can still navigate and detect collisions physically, but it will be visually invisible in Gazebo/rviz.
+
+### Q2: How can we solve the GitHub 100 MB limit for large `.obj` and `.dae` files?
+There are three standard methods to solve this:
+1. **Mesh Decimation (Recommended)**: Reduce the polygon/face count of the mesh using Blender or Python. CAD exports are often excessively dense. Decimating the mesh by 80-90% can reduce the file size from 106 MB to under 15 MB with virtually zero visible quality loss in the simulator.
+2. **Mesh Splitting**: Split the single large `.obj` file into separate files for each robot component (e.g. `chassis.obj`, `wheel.obj`, `sensor_mount.obj`). This reduces individual file sizes well below the 100 MB limit and makes the URDF file structure cleaner.
+3. **Git LFS (Large File Storage)**: Set up Git LFS in the repository to track large assets:
+   ```bash
+   git lfs install
+   git lfs track "*.obj"
+   git lfs track "*.dae"
+   ```
