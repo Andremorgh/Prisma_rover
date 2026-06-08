@@ -45,7 +45,3 @@ assets/models/
 *.pb
 *.csv
 
-ros2_ws/src/prisma_rover_description/meshes/prisma_rover.obj
-ros2_ws/src/prisma_rover_description/meshes/prisma_rover.dae
-*.obj
-*.dae
