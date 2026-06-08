@@ -4,6 +4,9 @@ An advanced, modular ROS 2 Humble robotic workspace designed for autonomous 3D n
 
 ![Prisma Rover](docs/real_rover.png)
 
+> [!NOTE]
+> For more detailed technical specifications, changes log, and design notes, please refer to the [docs/](file:///home/andrea/Desktop/Prisma_rover/docs) folder.
+
 ---
 
 ## Table of Contents
@@ -97,20 +100,16 @@ ros2 launch prisma_rover_obj_det_agent agent.launch.py visualization:=false
 
 ---
 
-## Simulation Assets FAQ
+## Simulation FAQ
 
-### Q1: Does the simulation work without `.obj` and `.dae` files? Can we just use the `.mtl` files?
-**No**, the simulation visual rendering will fail without `.obj` or `.dae` files:
-* **Geometry vs. Material**: The `.obj` and `.dae` files contain the actual 3D geometrical mesh (vertices, faces, and coordinates). The `.mtl` (Material Template Library) file only contains material properties (color, roughness, texture paths) applied *onto* that geometry. Without the mesh, there is no shape to color.
-* **Physics Collisions**: Physics engines use simplified geometric colliders (like cylinders for wheels and boxes for the chassis) defined in the URDF/SDF. Therefore, the robot can still navigate and detect collisions physically, but it will be visually invisible in Gazebo/rviz.
+### Q1: How can I run the Gazebo simulation in headless mode (no GUI)?
+To run the simulation without starting the Gazebo GUI (useful for remote servers or background runs), set the `headless:=true` parameter. For example:
+```bash
+ros2 launch prisma_rover_quantum_controller sim_controller.launch.py launch_sim:=true headless:=true
+```
 
-### Q2: How can we solve the GitHub 100 MB limit for large `.obj` and `.dae` files?
-There are three standard methods to solve this:
-1. **Mesh Decimation (Recommended)**: Reduce the polygon/face count of the mesh using Blender or Python. CAD exports are often excessively dense. Decimating the mesh by 80-90% can reduce the file size from 106 MB to under 15 MB with virtually zero visible quality loss in the simulator.
-2. **Mesh Splitting**: Split the single large `.obj` file into separate files for each robot component (e.g. `chassis.obj`, `wheel.obj`, `sensor_mount.obj`). This reduces individual file sizes well below the 100 MB limit and makes the URDF file structure cleaner.
-3. **Git LFS (Large File Storage)**: Set up Git LFS in the repository to track large assets:
-   ```bash
-   git lfs install
-   git lfs track "*.obj"
-   git lfs track "*.dae"
-   ```
+### Q2: Where are the files containing the mapped objects saved?
+The YOLO object detection agent dynamically updates and persists all detected objects and their coordinates into the `stored_objects.json` file located at the workspace root directory.
+
+### Q3: How do I switch active workspace build profiles?
+You can select build profiles at runtime using the scripts `./docker_build.sh <profile>` and `./docker_run.sh <profile>`. The active profile dynamically ignores excluded packages using `COLCON_IGNORE` tags under the hood.
