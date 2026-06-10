@@ -67,7 +67,7 @@ RUN git clone https://github.com/Livox-SDK/Livox-SDK2.git /tmp/Livox-SDK2 && \
 
 RUN git clone https://github.com/Livox-SDK/livox_ros_driver2.git /tmp/livox_ws/src/livox_ros_driver2 && \
     cd /tmp/livox_ws/src/livox_ros_driver2 && \
-    /bin/bash -c "source /opt/ros/humble/setup.bash && ./build.sh ROS2" && \
+    /bin/bash -c "source /opt/ros/humble/setup.bash && ./build.sh humble" && \
     mkdir -p /opt/livox_ws && \
     mv /tmp/livox_ws/install /opt/livox_ws/install && \
     rm -rf /tmp/livox_ws
