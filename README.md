@@ -118,3 +118,9 @@ You can select build profiles at runtime using the scripts `./docker_build.sh <p
 By default, ROS 2 uses multicast for node discovery, which can flood your local physical network with DDS traffic and cause severe latency. To prevent this, the workspace comes configured with **Localhost Isolation** by default:
 1. Inside Docker, `docker_run.sh` sets `--env="ROS_LOCALHOST_ONLY=1"`. This confines all DDS traffic strictly to the localhost loopback interface, completely blocking external network packets.
 2. If you want to communicate with external ROS 2 nodes on your physical network, you can disable this by setting `ROS_LOCALHOST_ONLY=0`, but you should then set a unique `ROS_DOMAIN_ID` (e.g. `export ROS_DOMAIN_ID=42`) on all participating machines to avoid crosstalk and limit discovery overhead.
+
+### Q5: Can I exclude the camera from the simulation to reduce rendering overhead?
+Yes. You can disable the camera by setting the `publish_camera:=false` launch argument. This propagates to the URDF model (excluding the camera visual/sensor collision rendering in Gazebo) and disables the camera topic bridge in `ros_gz_bridge`. Example:
+```bash
+ros2 launch prisma_rover_navigation sim_navigation.launch.py publish_camera:=false
+```
