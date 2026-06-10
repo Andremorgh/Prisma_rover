@@ -19,7 +19,7 @@ def generate_launch_description():
     tf_prefix = LaunchConfiguration('tf_prefix')
     rviz = LaunchConfiguration('rviz')
     headless = LaunchConfiguration('headless')
-    publish_camera = LaunchConfiguration('publish_camera')
+    camera = LaunchConfiguration('camera')
     lidar_type = LaunchConfiguration('lidar_type')
     slam_type = LaunchConfiguration('slam_type')
 
@@ -33,7 +33,7 @@ def generate_launch_description():
             "tf_prefix": tf_prefix,
             "rviz": rviz,
             "headless": headless,
-            "publish_camera": publish_camera,
+            "camera": camera,
             "lidar_type": lidar_type
         }.items()
     )
@@ -117,7 +117,7 @@ def generate_launch_description():
             description='If true, run simulation server only (no GUI client)'
         ),
         DeclareLaunchArgument(
-            'publish_camera',
+            'camera',
             default_value='true',
             description='If true, include and bridge camera sensors'
         ),

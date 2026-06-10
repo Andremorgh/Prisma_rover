@@ -19,7 +19,7 @@ def generate_launch_description():
 
     # Launch configurations
     lidar_type = LaunchConfiguration('lidar_type')
-    publish_camera = LaunchConfiguration('publish_camera')
+    camera = LaunchConfiguration('camera')
 
     # Launch arguments
     lidar_type_arg = DeclareLaunchArgument(
@@ -27,8 +27,8 @@ def generate_launch_description():
         default_value='3d',
         description='Type of LiDAR connected: 2d (RPLidar S2) or 3d (Livox Mid-360)'
     )
-    publish_camera_arg = DeclareLaunchArgument(
-        'publish_camera',
+    camera_arg = DeclareLaunchArgument(
+        'camera',
         default_value='true',
         description='Whether to launch RealSense camera driver'
     )
@@ -43,7 +43,7 @@ def generate_launch_description():
             'is_sim': 'false',
             'namespace': 'prisma_rover',
             'tf_prefix': 'prisma_rover/',
-            'publish_camera': publish_camera,
+            'camera': camera,
             'lidar_type': lidar_type
         }.items()
     )
@@ -130,12 +130,12 @@ def generate_launch_description():
             'pointcloud.enable': True,
             'base_frame_id': 'prisma_rover/camera_link',
         }],
-        condition=IfCondition(publish_camera)
+        condition=IfCondition(camera)
     )
 
     return LaunchDescription([
         lidar_type_arg,
-        publish_camera_arg,
+        camera_arg,
         description_launch,
         roboclaw_node,
         diffdrive_node,

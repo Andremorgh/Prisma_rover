@@ -30,7 +30,7 @@
 
 ### Key Launch Arguments
 * **`launch_sim`** (default: `"false"`): If `"true"`, launches the Gazebo simulation, EKF localization, and TF publishers automatically.
-* **`publish_camera`** (default: `"true"`): Set to `"false"` to disable camera spawning and topic bridges in simulation to save CPU/GPU resources.
+* **`camera`** (default: `"true"`): Set to `"false"` to disable camera spawning and topic bridges in simulation to save CPU/GPU resources.
 * **`headless`** (default: `"false"`): If `"true"`, runs Gazebo in server-only mode (no GUI).
 * **`world`** (default: `"depot.sdf"`): The SDF world file to load when launching the simulation.
 
@@ -40,5 +40,5 @@
 colcon build --packages-select prisma_rover_quantum_controller
 
 # Launch the fuzzy controller in simulation with camera disabled for performance
-ros2 launch prisma_rover_quantum_controller sim_controller.launch.py launch_sim:=true publish_camera:=false
+ros2 launch prisma_rover_quantum_controller sim_controller.launch.py launch_sim:=true camera:=false
 ```

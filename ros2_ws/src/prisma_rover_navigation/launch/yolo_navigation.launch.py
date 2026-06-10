@@ -37,7 +37,7 @@ def generate_launch_description():
             'world': 'yolo_world.sdf',
             'rviz': LaunchConfiguration('rviz'),
             'headless': LaunchConfiguration('headless'),
-            'publish_camera': 'true',
+            'camera': 'true',
             'namespace': 'prisma_rover',
             'tf_prefix': 'prisma_rover/'
         }.items()

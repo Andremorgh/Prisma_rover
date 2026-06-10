@@ -46,8 +46,8 @@ To launch the onboard sensors and drivers on the real robot:
 colcon build --packages-select prisma_rover_bringup
 
 # Example: Launch with Livox Mid-360 3D LiDAR and Camera enabled
-ros2 launch prisma_rover_bringup hardware_bringup.launch.py lidar_type:=3d publish_camera:=true
+ros2 launch prisma_rover_bringup hardware_bringup.launch.py lidar_type:=3d camera:=true
 
 # Example: Alternative launch with 2D RPLidar and camera disabled
-ros2 launch prisma_rover_bringup hardware_bringup.launch.py lidar_type:=2d publish_camera:=false
+ros2 launch prisma_rover_bringup hardware_bringup.launch.py lidar_type:=2d camera:=false
 ```

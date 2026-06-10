@@ -1,6 +1,6 @@
-# Prisma Rover: Autonomous Exploration & Mapping Workspace
+# Prisma Rover: Autonomous Simulation Workspace
 
-An advanced, modular ROS 2 Humble robotic workspace designed for autonomous 3D navigation, fuzzy obstacle avoidance, ArUco localization, and YOLO-based semantic object mapping.
+An advanced, modular ROS 2 Humble robotic workspace designed for autonomous 3D navigation, SLAM mapping, frontier-based exploration, and ArUco marker perception.
 
 ![Prisma Rover](docs/real_rover.png)
 
@@ -11,11 +11,10 @@ An advanced, modular ROS 2 Humble robotic workspace designed for autonomous 3D n
 
 ## Table of Contents
 1. [Workspace Architecture](#workspace-architecture)
-2. [Docker Integration & Build Profiles](#docker-integration--build-profiles)
+2. [Docker Integration & Build Setup](#docker-integration--build-setup)
 3. [Installation & Build](#installation--build)
 4. [Running the Simulation](#running-the-simulation)
-5. [Package Descriptions](#package-descriptions)
-6. [Simulation Assets FAQ](#simulation-assets-faq)
+5. [Simulation FAQ](#simulation-faq)
 
 ---
 
@@ -24,37 +23,28 @@ An advanced, modular ROS 2 Humble robotic workspace designed for autonomous 3D n
 The workspace is organized into modular ROS 2 packages under `ros2_ws/src/`, categorized by functionality:
 
 ### 1. Core Navigation & Description
-* **`prisma_rover_description`**: Contains the URDF, physics parameters, and 3D visual CAD meshes (chassis, wheels) representing the physical rover.
-* **`prisma_rover_sim`**: Houses the Gazebo ignition worlds (`depot.sdf`, `aruco_world.sdf`, `yolo_world.sdf`), and configures topic bridges via `ros_gz_bridge`.
-* **`prisma_rover_localization`**: Configures the Extended Kalman Filter (EKF) state estimation nodes, fusing wheel odometry and IMU data.
-* **`prisma_rover_navigation`**: Coordinates SLAM Toolbox configurations and Nav2 costmap/path-planner parameters.
-* **`prisma_rover_bringup`**: Central package hosting the main orchestration launch files.
+* **[prisma_rover_description](file:///home/andrea/Desktop/Prisma_rover/ros2_ws/src/prisma_rover_description)**: Contains the URDF model, physics parameters, and 3D Visual CAD meshes representing the rover chassis and wheels.
+* **[prisma_rover_sim](file:///home/andrea/Desktop/Prisma_rover/ros2_ws/src/prisma_rover_sim)**: Houses the Gazebo Ignition worlds (maze, warehouse, depot, obstacle_test, object_world, etc.), and configures topic bridges via `ros_gz_bridge`.
+* **[prisma_rover_localization](file:///home/andrea/Desktop/Prisma_rover/ros2_ws/src/prisma_rover_localization)**: Configures the Extended Kalman Filter (EKF) state estimation nodes, fusing wheel odometry and IMU data.
+* **[prisma_rover_navigation](file:///home/andrea/Desktop/Prisma_rover/ros2_ws/src/prisma_rover_navigation)**: Coordinates SLAM Toolbox configurations and Nav2 costmap/path-planner parameters.
 
 ### 2. Control & Exploration
-* **`prisma_rover_quantum_controller`**: Implements 2D/3D LiDAR-based fuzzy logic obstacle avoidance using look-up tables (LUT). Spreads over vectorized pointcloud processing for minimal latency.
-* **`prisma_rover_explorer`**: Handles frontier-based coverage algorithms for autonomous exploration and mapping.
-* **`prisma_rover_manager`**: High-level C++ orchestrator coordinating the transitions between localization, mapping, and exploration states.
-* **`prisma_rover_teleop`**: Keyboard and joystick teleoperation profiles.
+* **[prisma_rover_explorer](file:///home/andrea/Desktop/Prisma_rover/ros2_ws/src/prisma_rover_explorer)**: Handles frontier-based coverage algorithms for autonomous exploration and sweep coverage.
+* **[prisma_rover_manager](file:///home/andrea/Desktop/Prisma_rover/ros2_ws/src/prisma_rover_manager)**: High-level C++ orchestrator coordinating the transitions between localization, mapping, and exploration states.
+* **[prisma_rover_teleop](file:///home/andrea/Desktop/Prisma_rover/ros2_ws/src/prisma_rover_teleop)**: Keyboard and joystick teleoperation profiles.
 
-### 3. Perception & AI Mapping
-* **`prisma_rover_perception`**: Implements ArUco marker pose detection and coordinate transformations (`aruco_detector` and `aruco_pose_estimation`).
-* **`prisma_rover_obj_det_agent`**: Reinforcement learning agent that takes semantic mapping cues to steer exploration towards target search goals.
-* **`obj_detection`**: Integrates YOLO-based real-time bounding box segmentation and camera projection to locate objects in 3D coordinate space and log them into persistent storage.
+### 3. Perception & Custom Interfaces
+* **[aruco_detector](file:///home/andrea/Desktop/Prisma_rover/ros2_ws/src/prisma_rover_perception/aruco_detector)**: Identifies ArUco markers within video frames and broadcasts TF transforms for each detected marker.
+* **[aruco_pose_estimation](file:///home/andrea/Desktop/Prisma_rover/ros2_ws/src/prisma_rover_perception/aruco_pose_estimation)**: Synchronizes RGB and Depth camera streams to estimate and log the exact 3D coordinates of detected markers.
+* **[prisma_rover_interfaces](file:///home/andrea/Desktop/Prisma_rover/ros2_ws/src/prisma_rover_interfaces)**: Defines custom ROS 2 message structures (`ArucoMarkers`).
 
 ---
 
-## Docker Integration & Build Profiles
+## Docker Integration & Build Setup
 
-To maintain efficiency on various target hardware, this workspace supports **Workspace Profiling** via a multi-stage Docker environment:
+This workspace utilizes a simplified, single-stage Docker container environment that installs all dependencies required for the simulation, navigation stack, and ArUco perception. 
 
-| Profile | Included Packages | Excluded/Ignored Packages | Use Case |
-| :--- | :--- | :--- | :--- |
-| **`base`** | Navigation, Description, localization, Bringup, Sim, Teleop | `obj_detection`, `yolov11_ros2`, `prisma_rover_perception`, `prisma_rover_explorer`, `prisma_rover_obj_det_agent`, `prisma_rover_quantum_controller` | Light simulation, basic mapping |
-| **`yolo`** | Navigation, Perception (YOLO & ArUco), RL Agent, Bringup, Sim | `prisma_rover_quantum_controller` | Deep learning, visual semantic mapping |
-| **`quantum`**| Navigation, Quantum controller, Bringup, Sim, Teleop | `obj_detection`, `yolov11_ros2`, `prisma_rover_perception`, `prisma_rover_explorer`, `prisma_rover_obj_det_agent` | LiDAR-based fuzzy safety control |
-| **`full`** | All Workspace Packages | None | Full integration and training |
-
-At runtime, the `./docker_run.sh` script passes the profile to `entrypoint.sh` which dynamically injects `COLCON_IGNORE` tags in excluded folders to avoid building unnecessary dependencies.
+The environment builds as a single target image (`prisma_rover:simulation`) that compiles the entire workspace in one go.
 
 ---
 
@@ -62,18 +52,18 @@ At runtime, the `./docker_run.sh` script passes the profile to `entrypoint.sh` w
 
 ### Prerequisites
 * Docker installed on your host system
-* (Optional) NVIDIA Container Toolkit for GPU acceleration during YOLO inference
+* NVIDIA Container Toolkit (Optional, for GPU acceleration)
 
 ### Steps
-1. Build the Docker image for a specific profile (e.g. `base` or `yolo`):
+1. Build the Docker simulation image:
    ```bash
-   ./docker_build.sh base
+   ./docker_build.sh
    ```
 2. Launch the container:
    ```bash
-   ./docker_run.sh base
+   ./docker_run.sh
    ```
-3. Inside the container, compile the workspace:
+3. Inside the container, compile the ROS 2 workspace:
    ```bash
    colcon build --symlink-install
    ```
@@ -82,20 +72,20 @@ At runtime, the `./docker_run.sh` script passes the profile to `entrypoint.sh` w
 
 ## Running the Simulation
 
-To launch the full Gazebo simulation along with robot localization and state publishers:
+To launch the full Gazebo simulation along with robot localization, SLAM mapping, and Nav2 navigation:
 
 ```bash
-ros2 launch prisma_rover_bringup sim_system.launch.py profile:=base
+ros2 launch prisma_rover_navigation sim_navigation.launch.py rviz:=true
 ```
 
-For fuzzy obstacle avoidance testing (LiDAR):
+To run navigation with ArUco marker pose detection enabled:
 ```bash
-ros2 launch prisma_rover_quantum_controller sim_controller.launch.py launch_sim:=true
+ros2 launch prisma_rover_navigation aruco_navigation.launch.py rviz:=true
 ```
 
-For YOLO semantic mapping:
+To run keyboard teleoperation (in another container terminal):
 ```bash
-ros2 launch prisma_rover_obj_det_agent agent.launch.py visualization:=false
+ros2 run prisma_rover_teleop teleop_keyboard --ros-args -r __ns:=/prisma_rover
 ```
 
 ---
@@ -103,24 +93,18 @@ ros2 launch prisma_rover_obj_det_agent agent.launch.py visualization:=false
 ## Simulation FAQ
 
 ### Q1: How can I run the Gazebo simulation in headless mode (no GUI)?
-To run the simulation without starting the Gazebo GUI (useful for remote servers or background runs), set the `headless:=true` parameter. For example:
+To run the simulation without launching the Gazebo GUI (useful for background runs or low-resource hosts), set the `headless:=true` parameter. For example:
 ```bash
-ros2 launch prisma_rover_quantum_controller sim_controller.launch.py launch_sim:=true headless:=true
+ros2 launch prisma_rover_navigation sim_navigation.launch.py headless:=true
 ```
 
-### Q2: Where are the files containing the mapped objects saved?
-The YOLO object detection agent dynamically updates and persists all detected objects and their coordinates into the `stored_objects.json` file located at the workspace root directory.
+### Q2: How do I prevent ROS 2 from saturating my local network?
+By default, ROS 2 uses multicast for node discovery, which can flood your physical network. To prevent this, the workspace comes configured with **Localhost Isolation** enabled inside Docker:
+1. `docker_run.sh` sets `--env="ROS_LOCALHOST_ONLY=1"`. This confines DDS traffic strictly to the localhost loopback interface.
+2. If you want to communicate with external ROS 2 nodes on your network, you can set `ROS_LOCALHOST_ONLY=0` in your run script, but it is highly recommended to specify a unique `ROS_DOMAIN_ID` (e.g. `export ROS_DOMAIN_ID=42`) to avoid crosstalk.
 
-### Q3: How do I switch active workspace build profiles?
-You can select build profiles at runtime using the scripts `./docker_build.sh <profile>` and `./docker_run.sh <profile>`. The active profile dynamically ignores excluded packages using `COLCON_IGNORE` tags under the hood.
-
-### Q4: How do I prevent ROS 2 from saturating my local Wi-Fi or Ethernet network?
-By default, ROS 2 uses multicast for node discovery, which can flood your local physical network with DDS traffic and cause severe latency. To prevent this, the workspace comes configured with **Localhost Isolation** by default:
-1. Inside Docker, `docker_run.sh` sets `--env="ROS_LOCALHOST_ONLY=1"`. This confines all DDS traffic strictly to the localhost loopback interface, completely blocking external network packets.
-2. If you want to communicate with external ROS 2 nodes on your physical network, you can disable this by setting `ROS_LOCALHOST_ONLY=0`, but you should then set a unique `ROS_DOMAIN_ID` (e.g. `export ROS_DOMAIN_ID=42`) on all participating machines to avoid crosstalk and limit discovery overhead.
-
-### Q5: Can I exclude the camera from the simulation to reduce rendering overhead?
-Yes. You can disable the camera by setting the `publish_camera:=false` launch argument. This propagates to the URDF model (excluding the camera visual/sensor collision rendering in Gazebo) and disables the camera topic bridge in `ros_gz_bridge`. Example:
+### Q3: Can I exclude the camera from the simulation to reduce rendering overhead?
+Yes. You can disable the camera sensors and camera-to-ROS bridge by setting the `camera:=false` launch argument. For example:
 ```bash
-ros2 launch prisma_rover_navigation sim_navigation.launch.py publish_camera:=false
+ros2 launch prisma_rover_navigation sim_navigation.launch.py camera:=false
 ```

@@ -19,7 +19,7 @@ def generate_launch_description():
     headless = LaunchConfiguration('headless')
     rviz = LaunchConfiguration('rviz')
     world = LaunchConfiguration('world')
-    publish_camera = LaunchConfiguration('publish_camera')
+    camera = LaunchConfiguration('camera')
 
     # --------------------- Optional Simulation & Localization Boot ---------------------
     # Only triggered if launch_sim is true
@@ -39,7 +39,7 @@ def generate_launch_description():
             'tf_prefix': [namespace, '/'],
             'rviz': rviz,
             'headless': headless,
-            'publish_camera': publish_camera,
+            'camera': camera,
             'lidar_type': '3d'  # PointCloud 3D required by Lidar Listener
         }.items()
     )
@@ -117,7 +117,7 @@ def generate_launch_description():
             description='Gazebo world file to load'
         ),
         DeclareLaunchArgument(
-            'publish_camera',
+            'camera',
             default_value='true',
             description='If true, include and bridge camera sensors'
         ),

@@ -19,7 +19,7 @@ def generate_launch_description():
     namespace = LaunchConfiguration('namespace')
     tf_prefix = LaunchConfiguration('tf_prefix')
     rviz = LaunchConfiguration('rviz')
-    publish_camera = LaunchConfiguration('publish_camera')
+    camera = LaunchConfiguration('camera')
     lidar_type = LaunchConfiguration('lidar_type')
 
     # Launch Arguments
@@ -48,8 +48,8 @@ def generate_launch_description():
         default_value='false',
         description='Launch RViz2 with preconfigured layout if true'
     )
-    publish_camera_arg = DeclareLaunchArgument(
-        'publish_camera',
+    camera_arg = DeclareLaunchArgument(
+        'camera',
         default_value='true',
         description='Whether to include the camera in the URDF description'
     )
@@ -65,7 +65,7 @@ def generate_launch_description():
         ' is_sim:=', is_sim,
         ' namespace:=', namespace,
         ' tf_prefix:=', tf_prefix,
-        ' publish_camera:=', publish_camera,
+        ' camera:=', camera,
         ' lidar_type:=', lidar_type
     ])
 
@@ -103,7 +103,7 @@ def generate_launch_description():
         namespace_arg,
         tf_prefix_arg,
         rviz_arg,
-        publish_camera_arg,
+        camera_arg,
         lidar_type_arg,
         robot_state_publisher_node,
         rviz_node

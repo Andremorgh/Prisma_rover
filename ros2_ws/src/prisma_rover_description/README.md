@@ -20,16 +20,16 @@
   * `rover_gazebo.xacro`: Gazebo plugins (diff_drive physics engine, joint state publishers, simulated IMU, LiDAR, and camera sensors).
   * `utilities.xacro`: Mathematical functions and reusable inertia macros.
   * `imu.urdf`: Minimal standalone definition of the IMU sensor.
-* **`meshes/`**: Contains the 3D STL/DAE visual files used to render the robot parts in Gazebo and RViz.
+* **`meshes/`**: Contains the 3D OBJ/MTL visual files used to render the robot parts in Gazebo and RViz.
 
 ## Parameters and Configuration
 
 `description.launch.py` supports the following launch arguments:
-* `use_sim_time` (default: `true`): Set to `true` in simulation, `false` on real hardware.
+* `use_sim_time` (default: `true`): Set to `true` in simulation.
 * `namespace` (default: `""`): Namespace for the ROS 2 nodes and topics.
 * `tf_prefix` (default: `""`): Prefix added to all frames in the TF tree (e.g., `prisma_rover/`).
 * `rviz` (default: `false`): If set to `true`, launches the RViz2 graphical user interface.
-* `publish_camera` (default: `true`): If set to `false`, excludes the camera from the URDF model to save computing resources.
+* `camera` (default: `true`): If set to `false`, excludes the camera from the URDF model to save computing resources.
 * `lidar_type` (default: `3d`): Type of LiDAR model to include geometrically (`2d` or `3d`).
 
 ## How to Use
@@ -44,5 +44,5 @@ colcon build --packages-select prisma_rover_description
 ros2 launch prisma_rover_description description.launch.py
 
 # Example: Launch with RViz2 visualization, TF prefix enabled, and camera model disabled to save resources
-ros2 launch prisma_rover_description description.launch.py rviz:=true tf_prefix:=prisma_rover/ publish_camera:=false
+ros2 launch prisma_rover_description description.launch.py rviz:=true tf_prefix:=prisma_rover/ camera:=false
 ```

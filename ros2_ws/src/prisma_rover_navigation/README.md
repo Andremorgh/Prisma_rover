@@ -9,7 +9,7 @@
   * **RTAB-Map (3D SLAM)**: Visual or 3D LiDAR-based SLAM (ICP loop closure) for accurate 3D occupancy grid mapping.
 * **2D & 3D LiDAR Support**: Enables using a direct 2D LiDAR scan or projecting a 3D PointCloud2 stream (e.g., from Livox Mid-360) to a 2D scan using the `pointcloud_to_laserscan` node.
 * **Nav2 Path Planning & Control**: Launches the Nav2 stack, loading local/global costmaps, path planners, and local trajectory controllers based on **TEB Local Planner** (`teb_local_planner`).
-* **Test Scenarios & Demos**: Provides pre-configured launch files to verify navigation integrated with YOLOv11 or ArUco markers.
+* **Test Scenarios & Demos**: Provides pre-configured launch files to verify navigation integrated with ArUco markers.
 
 ## Package Structure
 
@@ -18,7 +18,6 @@
   * `slam.launch.py`: Configures and launches SLAM Toolbox or RTAB-Map with the appropriate LiDAR sensor settings.
   * `navigation.launch.py`: Spawns the Nav2 servers (lifecycle manager, planner, controller, recovery).
   * `aruco_navigation.launch.py`: Configures navigation integrated with ArUco marker tracking.
-  * `yolo_navigation.launch.py`: Configures navigation integrated with YOLOv11 object detection.
 * **`params/`**:
   * `nav2_params.yaml`: Complete parameter set for Nav2 servers, costmaps, and detailed TEB local planner configuration.
   * `mapper_params_online_async.yaml`: Configurations for SLAM Toolbox.
@@ -37,7 +36,7 @@
 
 ### Key Launch Arguments
 
-* **`publish_camera`** (default: `true`): Set to `false` to exclude the camera sensor from the URDF robot model and disable its topic bridge. This reduces simulation rendering and messaging overhead.
+* **`camera`** (default: `true`): Set to `false` to exclude the camera sensor from the URDF robot model and disable its topic bridge. This reduces simulation rendering and messaging overhead.
 * **`slam_type`** (default: `toolbox`): SLAM method: `"toolbox"` (SLAM Toolbox) or `"rtabmap"` (RTAB-Map).
 * **`lidar_type`** (default: `2d`): Lidar type to simulate: `"2d"` (RPLidar) or `"3d"` (Livox Mid-360).
 * **`headless`** (default: `false`): If `true`, runs the Gazebo simulator in server-only mode without starting the graphical client GUI.
@@ -50,10 +49,10 @@
 colcon build --packages-select prisma_rover_navigation
 
 # 1. Full launch in simulation with camera excluded to save resources (SLAM Toolbox + 2D LiDAR)
-ros2 launch prisma_rover_navigation sim_navigation.launch.py slam_type:=toolbox lidar_type:=2d publish_camera:=false
+ros2 launch prisma_rover_navigation sim_navigation.launch.py slam_type:=toolbox lidar_type:=2d camera:=false
 
 # 2. Full launch in simulation with camera enabled (RTAB-Map + 3D LiDAR)
-ros2 launch prisma_rover_navigation sim_navigation.launch.py slam_type:=rtabmap lidar_type:=3d publish_camera:=true
+ros2 launch prisma_rover_navigation sim_navigation.launch.py slam_type:=rtabmap lidar_type:=3d camera:=true
 
 # 3. Launch the ArUco navigation demo
 ros2 launch prisma_rover_navigation aruco_navigation.launch.py headless:=true rviz:=false
