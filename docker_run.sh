@@ -1,33 +1,27 @@
 #!/bin/bash
-# docker_run.sh: Script to launch the single development container for Prisma Rover
+# docker_run.sh: Script to launch the real hardware container for Prisma Rover
 
-# Parse options
 FORCE_SOFTWARE=false
-PROFILE="base"
-CONTAINER_NAME="prisma_rover_container"
+CONTAINER_NAME="prisma_rover_real_container"
+IMAGE_NAME="prisma_rover:real"
 
 for arg in "$@"; do
     if [ "$arg" = "software" ] || [ "$arg" = "cpu" ] || [ "$arg" = "--software" ]; then
         FORCE_SOFTWARE=true
-    elif [ "$arg" = "base" ] || [ "$arg" = "yolo" ] || [ "$arg" = "quantum" ] || [ "$arg" = "full" ]; then
-        PROFILE="$arg"
     else
         CONTAINER_NAME="$arg"
     fi
 done
 
-IMAGE_NAME="prisma_rover:$PROFILE"
-
-echo "=== Starting Docker Container ==="
-echo "Selected Profile: $PROFILE"
+echo "=== Starting Real Hardware Docker Container ==="
 echo "Image Name:       $IMAGE_NAME"
 echo "Container Name:   $CONTAINER_NAME"
-echo "=================================="
+echo "================================================"
 
-# Allow local GUI connections to X11
-xhost +local:root
+# Allow local GUI connections to X11 (for RViz inside container)
+xhost +local:root &>/dev/null || true
 
-# Automatic GPU detection
+# Automatic GPU detection for hardware rendering
 GPU_FLAGS=""
 ENV_FLAGS=""
 
@@ -35,14 +29,13 @@ if [ "$FORCE_SOFTWARE" = "true" ]; then
     echo "[GPU] Mesa Software Rendering forced (llvmpipe)."
     ENV_FLAGS="--env=LIBGL_ALWAYS_SOFTWARE=true --env=MESA_GL_VERSION_OVERRIDE=3.3"
 elif command -v nvidia-smi &> /dev/null && docker info 2>&1 | grep -iq "nvidia"; then
-    echo "[GPU] NVIDIA GPU detected with configured runtime. Enabling NVIDIA hardware acceleration."
+    echo "[GPU] NVIDIA GPU detected. Enabling NVIDIA hardware acceleration."
     GPU_FLAGS="--gpus all"
 elif [ -d "/dev/dri" ]; then
-    echo "[GPU] DRI device (/dev/dri) detected for AMD/Intel GPU. Enabling open-source hardware acceleration."
+    echo "[GPU] Intel/AMD DRI graphics card detected. Enabling hardware acceleration."
     GPU_FLAGS="--device /dev/dri:/dev/dri"
     
-    # Add host video and render GIDs to prevent Permission Denied inside the container
-    # and dynamically register them inside the container to prevent shell warning
+    # Add video and render GIDs to prevent Permission Denied
     SETUP_CMDS=""
     if getent group video &>/dev/null; then
         VIDEO_GID=$(getent group video | cut -d: -f3)
@@ -55,11 +48,14 @@ elif [ -d "/dev/dri" ]; then
         SETUP_CMDS="$SETUP_CMDS sudo groupadd -g $RENDER_GID host_render &>/dev/null; sudo usermod -aG host_render user &>/dev/null;"
     fi
 else
-    echo "[GPU] No supported GPU detected. Enabling Mesa software rendering (llvmpipe)."
+    echo "[GPU] No GPU detected. Enabling Mesa software rendering (llvmpipe)."
     ENV_FLAGS="--env=LIBGL_ALWAYS_SOFTWARE=true --env=MESA_GL_VERSION_OVERRIDE=3.3"
 fi
 
-# Start the container in interactive mode with hardware permissions and workspace mount
+# Default ROS_LOCALHOST_ONLY to 1 if not defined (keeps network traffic local by default)
+ROS_LH="${ROS_LOCALHOST_ONLY:-1}"
+
+# Start container with host networking, privileged permissions, and USB/Serial/Dev mounts
 if [ -n "$SETUP_CMDS" ]; then
     docker run --rm -it \
       --name="$CONTAINER_NAME" \
@@ -69,7 +65,7 @@ if [ -n "$SETUP_CMDS" ]; then
       $GPU_FLAGS \
       $ENV_FLAGS \
       --env="DISPLAY=$DISPLAY" \
-      --env="ROS_LOCALHOST_ONLY=1" \
+      --env="ROS_LOCALHOST_ONLY=$ROS_LH" \
       --volume="/tmp/.X11-unix:/tmp/.X11-unix:ro" \
       --volume="/dev:/dev" \
       --volume="$(pwd)/ros2_ws:/home/user/ros2_ws" \
@@ -84,7 +80,7 @@ else
       $GPU_FLAGS \
       $ENV_FLAGS \
       --env="DISPLAY=$DISPLAY" \
-      --env="ROS_LOCALHOST_ONLY=1" \
+      --env="ROS_LOCALHOST_ONLY=$ROS_LH" \
       --volume="/tmp/.X11-unix:/tmp/.X11-unix:ro" \
       --volume="/dev:/dev" \
       --volume="$(pwd)/ros2_ws:/home/user/ros2_ws" \
@@ -93,4 +89,4 @@ else
 fi
 
 # Restore X11 permissions on exit
-xhost -local:root
+xhost -local:root &>/dev/null || true

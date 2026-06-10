@@ -1,12 +1,12 @@
 # ==========================================
-# STAGE 1: Base ROS 2 Humble Environment
+# Real Robot Hardware ROS 2 Environment
 # ==========================================
-FROM ros:humble AS base-deps
+FROM ros:humble
 
 # Prevent interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install base dev dependencies and CycloneDDS
+# Install base dev tools, colcon, and CycloneDDS
 RUN apt-get update && apt-get install -y --no-install-recommends \
     software-properties-common \
     dialog \
@@ -23,8 +23,54 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     build-essential \
     python3-pip \
+    python3-colcon-common-extensions \
+    python3-rosdep \
     ros-humble-rmw-cyclonedds-cpp \
     && rm -rf /var/lib/apt/lists/*
+
+# Install hardware drivers and navigation/SLAM stack
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-humble-navigation2 \
+    ros-humble-nav2-bringup \
+    ros-humble-slam-toolbox \
+    ros-humble-realsense2-camera \
+    ros-humble-tf-transformations \
+    ros-humble-robot-localization \
+    ros-humble-rtabmap-ros \
+    ros-humble-pointcloud-to-laserscan \
+    ros-humble-xacro \
+    ros-humble-rviz2 \
+    ros-humble-joint-state-publisher \
+    ros-humble-joint-state-publisher-gui \
+    ros-humble-vision-opencv \
+    ros-humble-image-transport \
+    ros-humble-rplidar-ros \
+    ros-humble-rqt \
+    ros-humble-rqt-common-plugins \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install python dependencies for ArUco and motor drivers
+RUN pip3 install --no-cache-dir \
+    numpy \
+    transforms3d \
+    opencv-python \
+    pyserial
+
+# Compile and install Livox SDK2 and livox_ros_driver2
+# (Required for Ethernet UDP LiDAR communication)
+RUN git clone https://github.com/Livox-SDK/Livox-SDK2.git /tmp/Livox-SDK2 && \
+    cd /tmp/Livox-SDK2 && \
+    mkdir build && cd build && \
+    cmake .. && make -j$(nproc) && \
+    make install && \
+    rm -rf /tmp/Livox-SDK2
+
+RUN git clone https://github.com/Livox-SDK/livox_ros_driver2.git /tmp/livox_ws/src/livox_ros_driver2 && \
+    cd /tmp/livox_ws/src/livox_ros_driver2 && \
+    /bin/bash -c "source /opt/ros/humble/setup.bash && ./build.sh ROS2" && \
+    mkdir -p /opt/livox_ws && \
+    mv /tmp/livox_ws/install /opt/livox_ws/install && \
+    rm -rf /tmp/livox_ws
 
 # Add non-root user using UID and GID passed as build arguments
 ARG USER_ID=1000
@@ -34,7 +80,10 @@ ARG GROUP_ID=1000
 RUN groupadd --gid $GROUP_ID user || true && \
     useradd --uid $USER_ID --gid $GROUP_ID --create-home --shell /bin/bash user && \
     echo "user:user" | chpasswd && \
-    echo "user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    echo "user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+    usermod -aG dialout user && \
+    usermod -aG video user && \
+    usermod -aG plugdev user || true
 
 # Create workspace directories
 ENV HOME=/home/user
@@ -58,145 +107,12 @@ USER root
 RUN chmod +x /entrypoint.sh
 USER user
 
+# Configure automatically sourcing setups inside interactive shells
+RUN echo "source /opt/ros/humble/setup.bash;" >> /home/user/.bashrc && \
+    echo "if [ -f /opt/livox_ws/install/setup.bash ]; then source /opt/livox_ws/install/setup.bash; fi" >> /home/user/.bashrc && \
+    echo "if [ -f /home/user/ros2_ws/install/setup.bash ]; then source /home/user/ros2_ws/install/setup.bash; fi" >> /home/user/.bashrc && \
+    echo "export LD_LIBRARY_PATH=/usr/local/lib:\${LD_LIBRARY_PATH}" >> /home/user/.bashrc && \
+    echo "export CYCLONEDDS_URI=file:///home/user/cyclonedds_config.xml" >> /home/user/.bashrc
+
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["bash"]
-
-
-# ==========================================
-# STAGE 2: Simulation & Nav2 Dependencies
-# ==========================================
-FROM base-deps AS sim-deps
-
-USER root
-
-# Install Gazebo/Ignition Fortress and ROS-Gazebo bridges
-RUN curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null && \
-    apt-get update && apt-get install -y --no-install-recommends \
-    ignition-fortress \
-    assimp-utils \
-    ros-humble-ros-ign-bridge \
-    ros-humble-ros-gz \
-    ros-humble-controller-manager \
-    ros-humble-ros2-control \
-    ros-humble-ros2-controllers \
-    ros-humble-ign-ros2-control \
-    ros-humble-joint-state-publisher-gui \
-    ros-humble-xacro \
-    ros-humble-rviz2 \
-    ros-humble-rqt* \
-    ros-humble-navigation2 \
-    ros-humble-nav2-bringup \
-    ros-humble-robot-localization \
-    ros-humble-libg2o \
-    ros-humble-rtabmap \
-    ros-humble-rtabmap-ros \
-    ros-humble-pointcloud-to-laserscan \
-    && rm -rf /var/lib/apt/lists/*
-
-USER user
-
-
-# ==========================================
-# STAGE 3: YOLO / Perception Dependencies
-# ==========================================
-FROM sim-deps AS yolo-deps
-
-USER root
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ros-humble-vision-opencv \
-    ros-humble-image-transport \
-    ros-humble-tf-transformations \
-    python3-pip \
-    python3-setuptools \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN pip3 install --no-cache-dir numpy && \
-    pip3 install --no-cache-dir \
-    ultralytics \
-    lap \
-    lapx \
-    open3d \
-    shapely \
-    scikit-learn \
-    ros2-numpy
-
-USER user
-
-
-# ==========================================
-# STAGE 4: Quantum Dependencies
-# ==========================================
-FROM sim-deps AS quantum-deps
-
-USER root
-RUN pip3 install --no-cache-dir scipy
-USER user
-
-
-# ==========================================
-# STAGE 5: Combined/Full Dependencies
-# ==========================================
-FROM yolo-deps AS full-deps
-
-USER root
-RUN pip3 install --no-cache-dir scipy
-USER user
-
-
-# ==========================================
-# TARGETS: Compilation / Run Profiles
-# ==========================================
-
-# PROFILE: base
-FROM sim-deps AS base
-ENV ROVER_PROFILE=base
-
-USER root
-RUN echo "source /opt/ros/humble/setup.bash;" >> /home/user/.bashrc && \
-    echo "if [ -f /home/user/ros2_ws/install/setup.bash ]; then source /home/user/ros2_ws/install/setup.bash; fi" >> /home/user/.bashrc && \
-    echo "export LD_LIBRARY_PATH=/usr/local/lib:\${LD_LIBRARY_PATH}" >> /home/user/.bashrc && \
-    echo "export CYCLONEDDS_URI=file:///home/user/cyclonedds_config.xml" >> /home/user/.bashrc
-USER user
-
-
-# PROFILE: yolo
-FROM yolo-deps AS yolo
-ENV ROVER_PROFILE=yolo
-
-USER root
-RUN usermod -aG dialout user && \
-    usermod -aG video user && \
-    usermod -aG plugdev user || true
-RUN echo "source /opt/ros/humble/setup.bash;" >> /home/user/.bashrc && \
-    echo "if [ -f /home/user/ros2_ws/install/setup.bash ]; then source /home/user/ros2_ws/install/setup.bash; fi" >> /home/user/.bashrc && \
-    echo "export LD_LIBRARY_PATH=/usr/local/lib:\${LD_LIBRARY_PATH}" >> /home/user/.bashrc && \
-    echo "export CYCLONEDDS_URI=file:///home/user/cyclonedds_config.xml" >> /home/user/.bashrc
-USER user
-
-
-# PROFILE: quantum
-FROM quantum-deps AS quantum
-ENV ROVER_PROFILE=quantum
-
-USER root
-RUN echo "source /opt/ros/humble/setup.bash;" >> /home/user/.bashrc && \
-    echo "if [ -f /home/user/ros2_ws/install/setup.bash ]; then source /home/user/ros2_ws/install/setup.bash; fi" >> /home/user/.bashrc && \
-    echo "export LD_LIBRARY_PATH=/usr/local/lib:\${LD_LIBRARY_PATH}" >> /home/user/.bashrc && \
-    echo "export CYCLONEDDS_URI=file:///home/user/cyclonedds_config.xml" >> /home/user/.bashrc
-USER user
-
-
-# PROFILE: full
-FROM full-deps AS full
-ENV ROVER_PROFILE=full
-
-USER root
-RUN usermod -aG dialout user && \
-    usermod -aG video user && \
-    usermod -aG plugdev user || true
-RUN echo "source /opt/ros/humble/setup.bash;" >> /home/user/.bashrc && \
-    echo "if [ -f /home/user/ros2_ws/install/setup.bash ]; then source /home/user/ros2_ws/install/setup.bash; fi" >> /home/user/.bashrc && \
-    echo "export LD_LIBRARY_PATH=/usr/local/lib:\${LD_LIBRARY_PATH}" >> /home/user/.bashrc && \
-    echo "export CYCLONEDDS_URI=file:///home/user/cyclonedds_config.xml" >> /home/user/.bashrc
-USER user

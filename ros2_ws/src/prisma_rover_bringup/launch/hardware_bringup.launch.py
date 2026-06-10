@@ -40,7 +40,6 @@ def generate_launch_description():
         ),
         launch_arguments={
             'use_sim_time': 'false',
-            'is_sim': 'false',
             'namespace': 'prisma_rover',
             'tf_prefix': 'prisma_rover/',
             'camera': camera,

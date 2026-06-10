@@ -17,15 +17,13 @@
 * **`urdf/`**:
   * `rover.xacro`: Main entry point file loading the robot.
   * `rover_macro.xacro`: Xacro macros defining link geometries, inertia tensors, and physical properties.
-  * `rover_gazebo.xacro`: Gazebo plugins (diff_drive physics engine, joint state publishers, simulated IMU, LiDAR, and camera sensors).
   * `utilities.xacro`: Mathematical functions and reusable inertia macros.
-  * `imu.urdf`: Minimal standalone definition of the IMU sensor.
-* **`meshes/`**: Contains the 3D OBJ/MTL visual files used to render the robot parts in Gazebo and RViz.
+* **`meshes/`**: Contains the 3D OBJ/MTL visual files used to render the robot parts in RViz.
 
 ## Parameters and Configuration
 
 `description.launch.py` supports the following launch arguments:
-* `use_sim_time` (default: `true`): Set to `true` in simulation.
+* `use_sim_time` (default: `false`): Set to `true` if running with simulated clocks.
 * `namespace` (default: `""`): Namespace for the ROS 2 nodes and topics.
 * `tf_prefix` (default: `""`): Prefix added to all frames in the TF tree (e.g., `prisma_rover/`).
 * `rviz` (default: `false`): If set to `true`, launches the RViz2 graphical user interface.
@@ -40,9 +38,10 @@ To compile and launch the robot state publisher:
 # Compilation
 colcon build --packages-select prisma_rover_description
 
-# Example: Simple launch of the state publisher
+# Example: Simple launch of the state publisher (using default 3D Livox Mid-360 config)
 ros2 launch prisma_rover_description description.launch.py
 
-# Example: Launch with RViz2 visualization, TF prefix enabled, and camera model disabled to save resources
-ros2 launch prisma_rover_description description.launch.py rviz:=true tf_prefix:=prisma_rover/ camera:=false
+# Example: Launch with RViz2 visualization and camera model disabled
+ros2 launch prisma_rover_description description.launch.py rviz:=true camera:=false
 ```
+

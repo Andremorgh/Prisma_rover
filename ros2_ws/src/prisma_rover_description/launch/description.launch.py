@@ -15,7 +15,6 @@ def generate_launch_description():
 
     # Launch Configurations
     use_sim_time = LaunchConfiguration('use_sim_time')
-    is_sim = LaunchConfiguration('is_sim')
     namespace = LaunchConfiguration('namespace')
     tf_prefix = LaunchConfiguration('tf_prefix')
     rviz = LaunchConfiguration('rviz')
@@ -25,13 +24,8 @@ def generate_launch_description():
     # Launch Arguments
     use_sim_time_arg = DeclareLaunchArgument(
         'use_sim_time',
-        default_value='true',
-        description='Use simulation (Gazebo) clock if true'
-    )
-    is_sim_arg = DeclareLaunchArgument(
-        'is_sim',
-        default_value='true',
-        description='Configure description for simulation or real hardware'
+        default_value='false',
+        description='Use simulation clock if true'
     )
     namespace_arg = DeclareLaunchArgument(
         'namespace',
@@ -55,16 +49,14 @@ def generate_launch_description():
     )
     lidar_type_arg = DeclareLaunchArgument(
         'lidar_type',
-        default_value='2d',
+        default_value='3d',
         description='Lidar type to load: 2d (RPLidar S2) or 3d (Livox Mid-360)'
     )
 
     # Process Xacro with arguments
     robot_description_content = Command([
         'xacro ', xacro_file,
-        ' is_sim:=', is_sim,
         ' namespace:=', namespace,
-        ' tf_prefix:=', tf_prefix,
         ' camera:=', camera,
         ' lidar_type:=', lidar_type
     ])
@@ -99,7 +91,6 @@ def generate_launch_description():
 
     return LaunchDescription([
         use_sim_time_arg,
-        is_sim_arg,
         namespace_arg,
         tf_prefix_arg,
         rviz_arg,
@@ -108,3 +99,4 @@ def generate_launch_description():
         robot_state_publisher_node,
         rviz_node
     ])
+

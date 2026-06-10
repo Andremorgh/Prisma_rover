@@ -136,7 +136,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             'use_sim_time',
-            default_value='true',
+            default_value='false',
             description='Use simulation clock if true'
         ),
         DeclareLaunchArgument(
@@ -146,7 +146,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             'lidar_type',
-            default_value='2d',
+            default_value='3d',
             description='Lidar type to support: "2d" or "3d"'
         ),
         DeclareLaunchArgument(
