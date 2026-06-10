@@ -96,6 +96,7 @@ WORKDIR $WORKSPACE_DIR
 # Set environment variables
 ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 ENV ROS_DOMAIN_ID=90
+ENV LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH}
 
 # Copy CycloneDDS configuration
 COPY --chown=user docker/cyclonedds_config.xml $HOME/cyclonedds_config.xml

@@ -4,6 +4,8 @@ set -e
 # Source ROS 2 base installation
 source "/opt/ros/humble/setup.bash"
 
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+
 # Source CycloneDDS settings
 export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
