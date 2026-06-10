@@ -24,7 +24,7 @@
 ## How to Use
 
 ### Key Launch Arguments
-* **`publish_camera`** (default: `"true"`): Set to `"false"` to disable spawning the camera model and omit the Gazebo-to-ROS 2 camera image bridges, significantly reducing CPU/GPU overhead.
+* **`camera`** (default: `"true"`): Set to `"false"` to disable spawning the camera model and omit the Gazebo-to-ROS 2 camera image bridges, significantly reducing CPU/GPU overhead.
 * **`headless`** (default: `"false"`): If `"true"`, runs the simulation in server-only mode (no graphical client GUI window).
 * **`world`** (default: `"maze.sdf"`): The SDF world file to load.
 
@@ -34,5 +34,5 @@
 colcon build --packages-select prisma_rover_sim
 
 # Run the simulator with camera disabled to optimize performance
-ros2 launch prisma_rover_sim sim.launch.py headless:=false publish_camera:=false
+ros2 launch prisma_rover_sim sim.launch.py headless:=false camera:=false
 ```

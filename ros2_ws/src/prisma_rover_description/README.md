@@ -29,7 +29,7 @@
 * `namespace` (default: `""`): Namespace for the ROS 2 nodes and topics.
 * `tf_prefix` (default: `""`): Prefix added to all frames in the TF tree (e.g., `prisma_rover/`).
 * `rviz` (default: `false`): If set to `true`, launches the RViz2 graphical user interface.
-* `publish_camera` (default: `true`): If set to `false`, excludes the camera from the URDF model to save computing resources.
+* `camera` (default: `true`): If set to `false`, excludes the camera from the URDF model to save computing resources.
 * `lidar_type` (default: `3d`): Type of LiDAR model to include geometrically (`2d` or `3d`).
 
 ## How to Use
@@ -44,5 +44,5 @@ colcon build --packages-select prisma_rover_description
 ros2 launch prisma_rover_description description.launch.py
 
 # Example: Launch with RViz2 visualization, TF prefix enabled, and camera model disabled to save resources
-ros2 launch prisma_rover_description description.launch.py rviz:=true tf_prefix:=prisma_rover/ publish_camera:=false
+ros2 launch prisma_rover_description description.launch.py rviz:=true tf_prefix:=prisma_rover/ camera:=false
 ```

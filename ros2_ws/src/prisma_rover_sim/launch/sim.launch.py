@@ -14,7 +14,7 @@ def launch_setup(context, *args, **kwargs):
     use_sim_time_val = context.perform_substitution(LaunchConfiguration('use_sim_time'))
     rviz_val = context.perform_substitution(LaunchConfiguration('rviz'))
     headless_val = context.perform_substitution(LaunchConfiguration('headless'))
-    publish_camera_val = context.perform_substitution(LaunchConfiguration('publish_camera'))
+    camera_val = context.perform_substitution(LaunchConfiguration('camera'))
     lidar_type_val = context.perform_substitution(LaunchConfiguration('lidar_type'))
 
     # Retrieve package share directories
@@ -46,7 +46,7 @@ def launch_setup(context, *args, **kwargs):
             "namespace": namespace_val,
             "tf_prefix": tf_prefix_val,
             "rviz": rviz_val,
-            "publish_camera": publish_camera_val,
+            "camera": camera_val,
             "lidar_type": lidar_type_val
         }.items()
     )
@@ -84,7 +84,7 @@ def launch_setup(context, *args, **kwargs):
         bridge_args.append(f"{ns_prefix}/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan")
 
     # Append camera topics dynamically only if camera is enabled
-    if publish_camera_val.lower() == 'true':
+    if camera_val.lower() == 'true':
         bridge_args.extend([
             f"{ns_prefix}/color/camera_info@sensor_msgs/msg/CameraInfo@ignition.msgs.CameraInfo",
             f"{ns_prefix}/depth/camera_info@sensor_msgs/msg/CameraInfo@ignition.msgs.CameraInfo",
@@ -140,7 +140,7 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'tf_prefix',
             default_value='prisma_rover/',
-            description='Prefix to prepend to all TF frames (e.g. "prisma_rover/")'
+            description='Prefix to prepend to all tf frames (e.g. "prisma_rover/")'
         ),
         DeclareLaunchArgument(
             'rviz',
@@ -153,7 +153,7 @@ def generate_launch_description():
             description='If true, run simulation server only (no GUI client)'
         ),
         DeclareLaunchArgument(
-            'publish_camera',
+            'camera',
             default_value='true',
             description='If true, include and bridge camera sensors'
         ),

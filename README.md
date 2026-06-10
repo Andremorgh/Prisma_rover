@@ -104,7 +104,7 @@ By default, ROS 2 uses multicast for node discovery, which can flood your physic
 2. If you want to communicate with external ROS 2 nodes on your network, you can set `ROS_LOCALHOST_ONLY=0` in your run script, but it is highly recommended to specify a unique `ROS_DOMAIN_ID` (e.g. `export ROS_DOMAIN_ID=42`) to avoid crosstalk.
 
 ### Q3: Can I exclude the camera from the simulation to reduce rendering overhead?
-Yes. You can disable the camera sensors and camera-to-ROS bridge by setting the `publish_camera:=false` launch argument. For example:
+Yes. You can disable the camera sensors and camera-to-ROS bridge by setting the `camera:=false` launch argument. For example:
 ```bash
-ros2 launch prisma_rover_navigation sim_navigation.launch.py publish_camera:=false
+ros2 launch prisma_rover_navigation sim_navigation.launch.py camera:=false
 ```
