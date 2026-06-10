@@ -43,6 +43,6 @@ colcon build --packages-select prisma_rover_description
 # Example: Simple launch of the state publisher
 ros2 launch prisma_rover_description description.launch.py
 
-# Example: Launch with RViz2 visualization and TF prefix enabled
-ros2 launch prisma_rover_description description.launch.py rviz:=true tf_prefix:=prisma_rover/
+# Example: Launch with RViz2 visualization, TF prefix enabled, and camera model disabled to save resources
+ros2 launch prisma_rover_description description.launch.py rviz:=true tf_prefix:=prisma_rover/ publish_camera:=false
 ```

@@ -35,17 +35,25 @@
 
 ## How to Use
 
-The package provides multiple ways to launch the navigation stack. Below are some examples:
+### Key Launch Arguments
+
+* **`publish_camera`** (default: `true`): Set to `false` to exclude the camera sensor from the URDF robot model and disable its topic bridge. This reduces simulation rendering and messaging overhead.
+* **`slam_type`** (default: `toolbox`): SLAM method: `"toolbox"` (SLAM Toolbox) or `"rtabmap"` (RTAB-Map).
+* **`lidar_type`** (default: `2d`): Lidar type to simulate: `"2d"` (RPLidar) or `"3d"` (Livox Mid-360).
+* **`headless`** (default: `false`): If `true`, runs the Gazebo simulator in server-only mode without starting the graphical client GUI.
+* **`rviz`** (default: `false`): Set to `true` to launch RViz2 alongside navigation.
+
+### Launch Examples
 
 ```bash
 # Compilation
 colcon build --packages-select prisma_rover_navigation
 
-# 1. Full launch in simulation (SLAM Toolbox + 2D LiDAR)
-ros2 launch prisma_rover_navigation sim_navigation.launch.py slam_type:=toolbox lidar_type:=2d
+# 1. Full launch in simulation with camera excluded to save resources (SLAM Toolbox + 2D LiDAR)
+ros2 launch prisma_rover_navigation sim_navigation.launch.py slam_type:=toolbox lidar_type:=2d publish_camera:=false
 
-# 2. Full launch in simulation (RTAB-Map + 3D LiDAR)
-ros2 launch prisma_rover_navigation sim_navigation.launch.py slam_type:=rtabmap lidar_type:=3d
+# 2. Full launch in simulation with camera enabled (RTAB-Map + 3D LiDAR)
+ros2 launch prisma_rover_navigation sim_navigation.launch.py slam_type:=rtabmap lidar_type:=3d publish_camera:=true
 
 # 3. Launch the ArUco navigation demo
 ros2 launch prisma_rover_navigation aruco_navigation.launch.py headless:=true rviz:=false
