@@ -36,7 +36,6 @@
 * `rclpy`, `sensor_msgs`, `geometry_msgs`, `std_msgs`
 * `prisma_rover_interfaces` (custom interfaces)
 * `tf_transformations` (for quaternion conversions)
-* `open3d` (3D processing library)
 * OpenCV Python (`opencv-python` / `cv_bridge`)
 
 ## How to Use

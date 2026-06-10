@@ -3,23 +3,19 @@
 
 # Parse options
 FORCE_SOFTWARE=false
-PROFILE="base"
 CONTAINER_NAME="prisma_rover_container"
 
 for arg in "$@"; do
     if [ "$arg" = "software" ] || [ "$arg" = "cpu" ] || [ "$arg" = "--software" ]; then
         FORCE_SOFTWARE=true
-    elif [ "$arg" = "base" ] || [ "$arg" = "yolo" ] || [ "$arg" = "quantum" ] || [ "$arg" = "full" ]; then
-        PROFILE="$arg"
     else
         CONTAINER_NAME="$arg"
     fi
 done
 
-IMAGE_NAME="prisma_rover:$PROFILE"
+IMAGE_NAME="prisma_rover:simulation"
 
 echo "=== Starting Docker Container ==="
-echo "Selected Profile: $PROFILE"
 echo "Image Name:       $IMAGE_NAME"
 echo "Container Name:   $CONTAINER_NAME"
 echo "=================================="

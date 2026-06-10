@@ -9,7 +9,7 @@
   * **RTAB-Map (3D SLAM)**: Visual or 3D LiDAR-based SLAM (ICP loop closure) for accurate 3D occupancy grid mapping.
 * **2D & 3D LiDAR Support**: Enables using a direct 2D LiDAR scan or projecting a 3D PointCloud2 stream (e.g., from Livox Mid-360) to a 2D scan using the `pointcloud_to_laserscan` node.
 * **Nav2 Path Planning & Control**: Launches the Nav2 stack, loading local/global costmaps, path planners, and local trajectory controllers based on **TEB Local Planner** (`teb_local_planner`).
-* **Test Scenarios & Demos**: Provides pre-configured launch files to verify navigation integrated with YOLOv11 or ArUco markers.
+* **Test Scenarios & Demos**: Provides pre-configured launch files to verify navigation integrated with ArUco markers.
 
 ## Package Structure
 
@@ -18,7 +18,6 @@
   * `slam.launch.py`: Configures and launches SLAM Toolbox or RTAB-Map with the appropriate LiDAR sensor settings.
   * `navigation.launch.py`: Spawns the Nav2 servers (lifecycle manager, planner, controller, recovery).
   * `aruco_navigation.launch.py`: Configures navigation integrated with ArUco marker tracking.
-  * `yolo_navigation.launch.py`: Configures navigation integrated with YOLOv11 object detection.
 * **`params/`**:
   * `nav2_params.yaml`: Complete parameter set for Nav2 servers, costmaps, and detailed TEB local planner configuration.
   * `mapper_params_online_async.yaml`: Configurations for SLAM Toolbox.

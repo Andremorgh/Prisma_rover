@@ -3,7 +3,7 @@ ros2_ws/build/
 ros2_ws/install/
 ros2_ws/log/
 
-# Dynamic ROS 2 workspace package filters (crucial to avoid committing profile exclusions)
+# Prevent committing local colcon build ignore files
 **/COLCON_IGNORE
 
 # Python cache and compiled files

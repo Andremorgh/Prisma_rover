@@ -14,10 +14,6 @@ find_package(std_msgs REQUIRED)
 # Genera messaggi per il pacchetto
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Dummy.msg"
-  "msg/RoboclawEncoderSteps.msg"
-  "msg/RoboclawMotorVelocity.msg"
-  "msg/DetectedObject.msg"
-  "msg/DetectedObjectsList.msg"
   "msg/ArucoMarkers.msg"
   DEPENDENCIES geometry_msgs std_msgs
 )

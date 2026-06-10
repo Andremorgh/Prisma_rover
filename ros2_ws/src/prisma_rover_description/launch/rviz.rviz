@@ -337,7 +337,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /prisma_rover/yolo/prediction/image/compressed
+        Value: /prisma_rover/aruco/image
       Value: true
   Enabled: true
   Global Options:
