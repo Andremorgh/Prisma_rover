@@ -40,12 +40,12 @@ def generate_launch_description():
         description='Percorso assoluto del file YAML di configurazione del joystick'
     )
 
-    # 1. Nodo di teleoperazione da tastiera (custom)
     teleop_keyboard_node = Node(
         package='prisma_rover_teleop',
         executable='teleop_keyboard',
         name='teleop_keyboard_node',
         output='screen',
+        prefix='xterm -e',
         parameters=[{
             'cmd_vel_topic': cmd_vel_topic,
         }],

@@ -77,7 +77,13 @@ class TeleopKeyboard(Node):
         self.get_logger().info(f"Initial limits: linear={self.speed:.2f} m/s, angular={self.turn:.2f} rad/s")
 
     def run(self):
-        settings = termios.tcgetattr(sys.stdin)
+        try:
+            settings = termios.tcgetattr(sys.stdin)
+        except termios.error:
+            print("\n[ERROR] Keyboard teleop must be run in an interactive terminal (TTY) or using xterm.")
+            print("Please run it directly on the host or inside a docker exec shell with:")
+            print("ros2 run prisma_rover_teleop teleop_keyboard --ros-args -r __ns:=/prisma_rover\n")
+            return
         
         target_linear = 0.0
         target_angular = 0.0
