@@ -4,7 +4,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PythonExpression
-from launch.conditions import IfCondition, EqualsCondition
+from launch.conditions import IfCondition
 from launch_ros.actions import Node
 
 def generate_launch_description():
@@ -91,7 +91,7 @@ def generate_launch_description():
             'inverted': False,
             'angle_compensate': True,
         }],
-        condition=EqualsCondition(lidar_type, '2d')
+        condition=IfCondition(PythonExpression(["'", lidar_type, "' == '2d'"]))
     )
 
     # 6. Livox Mid-360 Lidar 3D (launched if lidar_type == '3d')
@@ -110,7 +110,7 @@ def generate_launch_description():
             'frame_id': 'prisma_rover/laser_link',
             'user_config_path': livox_json_config
         }],
-        condition=EqualsCondition(lidar_type, '3d')
+        condition=IfCondition(PythonExpression(["'", lidar_type, "' == '3d'"]))
     )
 
     # 7. RealSense Camera Node
