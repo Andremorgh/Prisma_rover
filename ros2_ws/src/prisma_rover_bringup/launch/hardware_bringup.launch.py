@@ -20,6 +20,7 @@ def generate_launch_description():
     # Launch configurations
     lidar_type = LaunchConfiguration('lidar_type')
     camera = LaunchConfiguration('camera')
+    rviz = LaunchConfiguration('rviz')
 
     # Launch arguments
     lidar_type_arg = DeclareLaunchArgument(
@@ -32,6 +33,11 @@ def generate_launch_description():
         default_value='false',
         description='Whether to launch RealSense camera driver'
     )
+    rviz_arg = DeclareLaunchArgument(
+        'rviz',
+        default_value='false',
+        description='Whether to launch RViz2'
+    )
 
     # 1. Include Description (State Publisher)
     description_launch = IncludeLaunchDescription(
@@ -43,7 +49,8 @@ def generate_launch_description():
             'namespace': 'prisma_rover',
             'tf_prefix': 'prisma_rover/',
             'camera': camera,
-            'lidar_type': lidar_type
+            'lidar_type': lidar_type,
+            'rviz': rviz
         }.items()
     )
 
@@ -138,6 +145,7 @@ def generate_launch_description():
     return LaunchDescription([
         lidar_type_arg,
         camera_arg,
+        rviz_arg,
         description_launch,
         roboclaw_node,
         diffdrive_node,

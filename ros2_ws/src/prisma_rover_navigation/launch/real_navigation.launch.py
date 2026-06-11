@@ -18,13 +18,15 @@ def generate_launch_description():
     camera = LaunchConfiguration('camera')
     lidar_type = LaunchConfiguration('lidar_type')
     slam_type = LaunchConfiguration('slam_type')
+    rviz = LaunchConfiguration('rviz')
 
     # 1. Hardware Bringup (Motor drivers, EKF, Sensors)
     hardware_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(pkg_bringup_share, "launch", "hardware_bringup.launch.py")),
         launch_arguments={
             "camera": camera,
-            "lidar_type": lidar_type
+            "lidar_type": lidar_type,
+            "rviz": rviz
         }.items()
     )
 
@@ -94,6 +96,11 @@ def generate_launch_description():
             'slam_type',
             default_value='toolbox',
             description='SLAM method: "toolbox" (SLAM Toolbox) or "rtabmap" (RTAB-Map)'
+        ),
+        DeclareLaunchArgument(
+            'rviz',
+            default_value='false',
+            description='Whether to launch RViz2'
         ),
 
         hardware_launch,

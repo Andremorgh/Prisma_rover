@@ -37,7 +37,7 @@
             <visual>
                 <origin xyz="0 0 -0.035" rpy="0 0 0"/>
                 <geometry>
-                    <mesh filename="file://$(find prisma_rover_description)/meshes/prisma_rover.obj" scale="0.001 0.001 0.001"/>
+                    <mesh filename="package://prisma_rover_description/meshes/prisma_rover.obj" scale="0.001 0.001 0.001"/>
                 </geometry>
                 <material name="silver">
                     <color rgba="0.7 0.7 0.7 1.0"/>
@@ -99,7 +99,7 @@
             <visual>
                 <origin xyz="0 0 0" rpy="-1.57 0 0" />
                 <geometry>
-                    <mesh filename="file://$(find prisma_rover_description)/meshes/pro_tire.obj" scale="0.5 0.5 1.0"/>
+                    <mesh filename="package://prisma_rover_description/meshes/pro_tire.obj" scale="0.5 0.5 1.0"/>
                 </geometry>
                 <material name="dark_grey">
                     <color rgba="0.15 0.15 0.15 1.0"/>
@@ -130,7 +130,7 @@
             <visual>
                 <origin xyz="0 0 0" rpy="1.57 0 0" />
                 <geometry>
-                    <mesh filename="file://$(find prisma_rover_description)/meshes/pro_tire.obj" scale="0.5 0.5 1.0"/>
+                    <mesh filename="package://prisma_rover_description/meshes/pro_tire.obj" scale="0.5 0.5 1.0"/>
                 </geometry>
                 <material name="dark_grey">
                     <color rgba="0.15 0.15 0.15 1.0"/>
@@ -161,7 +161,7 @@
             <visual>
                 <origin xyz="0 0 0" rpy="1.57 0 3.1415" />
                 <geometry>
-                    <mesh filename="file://$(find prisma_rover_description)/meshes/pro_tire.obj" scale="0.5 0.5 1.0"/>
+                    <mesh filename="package://prisma_rover_description/meshes/pro_tire.obj" scale="0.5 0.5 1.0"/>
                 </geometry>
                 <material name="dark_grey">
                     <color rgba="0.15 0.15 0.15 1.0"/>
@@ -192,7 +192,7 @@
             <visual>
                 <origin xyz="0 0 0" rpy="-1.57 0 3.1415" />
                 <geometry>
-                    <mesh filename="file://$(find prisma_rover_description)/meshes/pro_tire.obj" scale="0.5 0.5 1.0"/>
+                    <mesh filename="package://prisma_rover_description/meshes/pro_tire.obj" scale="0.5 0.5 1.0"/>
                 </geometry>
                 <material name="dark_grey">
                     <color rgba="0.15 0.15 0.15 1.0"/>
@@ -241,7 +241,7 @@
             <visual>
                 <origin xyz="0 0 0" rpy="1.57 0 1.57"/>
                 <geometry>
-                    <mesh filename="file://$(find prisma_rover_description)/meshes/realsense.obj"/>
+                    <mesh filename="package://prisma_rover_description/meshes/realsense.obj"/>
                 </geometry>
                 <material name="camera_black">
                     <color rgba="0.2 0.2 0.2 1.0"/>
@@ -296,7 +296,7 @@
             <visual>
                 <origin xyz="0 0 0" rpy="-1.57 3.1415 3.1415"/>
                 <geometry>
-                    <mesh filename="file://$(find prisma_rover_description)/meshes/rplidar_s2.obj"/>
+                    <mesh filename="package://prisma_rover_description/meshes/rplidar_s2.obj"/>
                 </geometry>
                 <material name="lidar_red">
                     <color rgba="0.8 0.2 0.2 1.0"/>
