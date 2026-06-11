@@ -110,6 +110,9 @@ def generate_launch_description():
             'frame_id': 'prisma_rover/laser_link',
             'user_config_path': livox_json_config
         }],
+        remappings=[
+            ('livox/lidar', 'scan_3d')
+        ],
         condition=IfCondition(PythonExpression(["'", lidar_type, "' == '3d'"]))
     )
 
