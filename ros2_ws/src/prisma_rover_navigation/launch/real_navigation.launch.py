@@ -82,7 +82,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             'camera',
-            default_value='true',
+            default_value='false',
             description='If true, launch physical camera'
         ),
         DeclareLaunchArgument(

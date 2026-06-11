@@ -29,7 +29,7 @@ def generate_launch_description():
     )
     camera_arg = DeclareLaunchArgument(
         'camera',
-        default_value='true',
+        default_value='false',
         description='Whether to launch RealSense camera driver'
     )
 
