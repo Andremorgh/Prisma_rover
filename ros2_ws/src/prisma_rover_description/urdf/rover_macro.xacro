@@ -118,10 +118,9 @@
             </inertial>
         </link>
         
-        <joint name="fr_wheel_to_base" type="continuous">
+        <joint name="fr_wheel_to_base" type="fixed">
             <parent link="base_link"/> 
             <child link="fr_wheel_link"/>
-            <axis xyz="0 1 0"/>
             <origin xyz="${wheel_x_offset + front_flipper_x_offset} ${-wheel_y_offset} 0" rpy="0 0 0"/>
         </joint>
 
@@ -149,10 +148,9 @@
             </inertial>
         </link>
 
-        <joint name="fl_wheel_to_base" type="continuous">
+        <joint name="fl_wheel_to_base" type="fixed">
             <parent link="base_link"/>
             <child link="fl_wheel_link"/>
-            <axis xyz="0 1 0"/>
             <origin xyz="${wheel_x_offset + front_flipper_x_offset} ${wheel_y_offset} 0" rpy="0 0 0"/>
         </joint>
 
@@ -180,10 +178,9 @@
             </inertial>
         </link>
 
-        <joint name="rr_wheel_to_base" type="continuous">
+        <joint name="rr_wheel_to_base" type="fixed">
             <parent link="base_link"/>
             <child link="rr_wheel_link"/>
-            <axis xyz="0 1 0"/>
             <origin xyz="${-wheel_x_offset} ${-wheel_y_offset} 0" rpy="0 0 0"/>
         </joint>
 
@@ -211,10 +208,9 @@
             </inertial>
         </link>
 
-        <joint name="rl_wheel_to_base" type="continuous">
+        <joint name="rl_wheel_to_base" type="fixed">
             <parent link="base_link"/>
             <child link="rl_wheel_link"/>
-            <axis xyz="0 1 0"/>
             <origin xyz="${-wheel_x_offset} ${wheel_y_offset} 0" rpy="0 0 0"/>
         </joint>
     </xacro:macro>

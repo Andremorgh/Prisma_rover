@@ -77,19 +77,6 @@ def generate_launch_description():
         ]
     )
 
-    # Joint State Publisher Node
-    joint_state_publisher_node = Node(
-        package='joint_state_publisher',
-        executable='joint_state_publisher',
-        name='joint_state_publisher',
-        namespace=namespace,
-        output='screen',
-        parameters=[
-            robot_description,
-            {'use_sim_time': use_sim_time}
-        ]
-    )
-
     # RViz2 Node (launched conditionally)
     rviz_node = Node(
         package='rviz2',
@@ -110,7 +97,6 @@ def generate_launch_description():
         camera_arg,
         lidar_type_arg,
         robot_state_publisher_node,
-        joint_state_publisher_node,
         rviz_node
     ])
 
