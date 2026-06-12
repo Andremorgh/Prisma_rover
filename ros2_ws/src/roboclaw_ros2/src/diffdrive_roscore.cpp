@@ -204,9 +204,7 @@ namespace roboclaw {
         
 
         // Time
-        //odom.header.stamp = ros::Time::now();
-        rclcpp::Clock steady_clock = rclcpp::Clock(RCL_STEADY_TIME);
-        odom.header.stamp = steady_clock.now();
+        odom.header.stamp = this->now();
 
         // Position
         odom.pose.pose.position.x = cur_x;
@@ -245,7 +243,7 @@ namespace roboclaw {
 
         if (publish_tf) {
             geometry_msgs::msg::TransformStamped transformStamped;
-            transformStamped.header.stamp = steady_clock.now();
+            transformStamped.header.stamp = this->now();
             transformStamped.header.frame_id = odom_tf_name;
             transformStamped.child_frame_id = base_tf_name;
             transformStamped.transform.translation.x = transform.getOrigin().getX();
@@ -306,8 +304,7 @@ namespace roboclaw {
         odom.child_frame_id = base_tf_name;
 
         // Time
-        rclcpp::Clock steady_clock = rclcpp::Clock(RCL_STEADY_TIME);
-        odom.header.stamp = steady_clock.now();
+        odom.header.stamp = this->now();
 
         // Position
         odom.pose.pose.position.x = cur_x;
@@ -344,7 +341,7 @@ namespace roboclaw {
         //br->sendTransform(tf2::StampedTransform(transform, rclcpp::Time::now(), odom_tf_name, base_tf_name));
         if (publish_tf) {
             geometry_msgs::msg::TransformStamped transformStamped;
-            transformStamped.header.stamp = steady_clock.now();
+            transformStamped.header.stamp = this->now();
             transformStamped.header.frame_id = odom_tf_name;
             transformStamped.child_frame_id = base_tf_name;
             transformStamped.transform.translation.x = transform.getOrigin().getX();
