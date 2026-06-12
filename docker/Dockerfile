@@ -46,6 +46,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-humble-vision-opencv \
     ros-humble-image-transport \
     ros-humble-rplidar-ros \
+    ros-humble-joy \
+    ros-humble-teleop-twist-joy \
     ros-humble-rqt \
     ros-humble-rqt-common-plugins \
     && rm -rf /var/lib/apt/lists/*
