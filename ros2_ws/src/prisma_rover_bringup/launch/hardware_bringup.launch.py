@@ -138,6 +138,8 @@ def generate_launch_description():
             'rgb_camera.profile': '640x480x30',
             'pointcloud.enable': True,
             'base_frame_id': 'prisma_rover/camera_link',
+            'enable_gyro': False,
+            'enable_accel': False
         }],
         condition=IfCondition(camera)
     )
