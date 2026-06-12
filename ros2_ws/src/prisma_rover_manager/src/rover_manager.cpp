@@ -278,10 +278,7 @@ void RoverManager::execute_command(const std::string& cmd)
         navigation_in_progress = false;
     }
     else if(op == "stop" || op == "emergency_stop"){
-        if(client_ptr_) client_ptr_->async_cancel_all_goals();
-        geometry_msgs::msg::Twist tw; 
-        tw.linear.x = tw.linear.y = tw.angular.z = 0.0;
-        cmd_vel_pub_->publish(tw);
+        all_stop();
         nav2_running = false; 
         coverage_active = false; 
         command_running = false; 
