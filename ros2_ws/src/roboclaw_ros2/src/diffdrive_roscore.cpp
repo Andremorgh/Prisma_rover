@@ -126,6 +126,7 @@ namespace roboclaw {
         //twist_sub = nh.subscribe(std::msg:string("cmd_vel"), 10, &diffdrive_roscore::twist_callback, this);
         twist_sub = create_subscription<geometry_msgs::msg::Twist>(namespace_ + "/cmd_vel", 10,std::bind(&diffdrive_roscore::twist_callback, this,std::placeholders::_1));
 
+        tf_broadcaster = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
     }
 
     void diffdrive_roscore::twist_callback(const geometry_msgs::msg::Twist &msg) {
@@ -166,9 +167,6 @@ namespace roboclaw {
 
     void diffdrive_roscore::encoder_callback(const prisma_rover_interfaces::msg::RoboclawEncoderSteps &msg) {
 
-        // static tf::TransformBroadcaster br;
-        std::unique_ptr<tf2_ros::TransformBroadcaster> br;
-        br = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
         int delta_1 = msg.mot1_enc_steps - last_steps_1;
         int delta_2 = msg.mot2_enc_steps - last_steps_2;
         // RCLCPP_INFO(rclcpp::get_logger("rclcpp"),"Motor1 enc: %d\n",delta_1);
@@ -260,7 +258,7 @@ namespace roboclaw {
             transformStamped.transform.rotation.z = quaternion.z();
             transformStamped.transform.rotation.w = quaternion.w();
 
-            br->sendTransform(transformStamped);
+            tf_broadcaster->sendTransform(transformStamped);
         }
         //RCLCPP_INFO(rclcpp::get_logger("rclcpp"),"Pulish odom");
         odom_pub->publish(odom);
@@ -273,9 +271,6 @@ namespace roboclaw {
 
     void diffdrive_roscore::encoder_callback_runge_kutta(const prisma_rover_interfaces::msg::RoboclawEncoderSteps &msg)
     {
-        //static tf::TransformBroadcaster br;
-        std::unique_ptr<tf2_ros::TransformBroadcaster> br;
-
         int delta_1 = msg.mot1_enc_steps - last_steps_1;
         int delta_2 = msg.mot2_enc_steps - last_steps_2;
 
@@ -362,7 +357,7 @@ namespace roboclaw {
             transformStamped.transform.rotation.z = quaternion.z();
             transformStamped.transform.rotation.w = quaternion.w();
 
-            br->sendTransform(transformStamped);
+            tf_broadcaster->sendTransform(transformStamped);
         }
 
         odom_pub->publish(odom);

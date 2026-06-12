@@ -34,6 +34,8 @@
 #include "nav_msgs/msg/odometry.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 
+#include "tf2_ros/transform_broadcaster.h"
+
 namespace roboclaw {
 
     class diffdrive_roscore : public rclcpp::Node {
@@ -75,6 +77,8 @@ namespace roboclaw {
         std::string odom_tf_name;
         std::string base_tf_name;
         std::string namespace_;
+
+        std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster;
 
         void twist_callback(const geometry_msgs::msg::Twist &msg);
 
