@@ -1,12 +1,12 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, TimerAction
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, TimerAction, OpaqueFunction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
-def generate_launch_description():
+def launch_setup(context, *args, **kwargs):
     # Retrieve package share directories
     pkg_navigation = get_package_share_directory('prisma_rover_navigation')
     pkg_aruco = get_package_share_directory('aruco_pose_estimation')
@@ -19,6 +19,10 @@ def generate_launch_description():
     tf_prefix = LaunchConfiguration('tf_prefix')
     lidar_type = LaunchConfiguration('lidar_type')
     slam_type = LaunchConfiguration('slam_type')
+
+    namespace_val = context.perform_substitution(namespace)
+    tf_prefix_val = context.perform_substitution(tf_prefix)
+    use_sim_time_val = context.perform_substitution(use_sim_time).lower() == 'true'
 
     # 1. Include Real Navigation launch (with camera forced to true)
     real_nav_launch = IncludeLaunchDescription(
@@ -37,15 +41,15 @@ def generate_launch_description():
     aruco_node = Node(
         package='aruco_pose_estimation',
         executable='aruco_node',
-        namespace=namespace,
+        namespace=namespace_val,
         parameters=[
             aruco_params_file,
             {
-                'use_sim_time': use_sim_time,
+                'use_sim_time': use_sim_time_val,
                 'image_topic': 'camera/color/image_raw',
                 'camera_info_topic': 'camera/color/camera_info',
-                'camera_frame': [tf_prefix, 'camera_rgb_optical_frame'],
-                'map_frame': [tf_prefix, 'map'],
+                'camera_frame': f"{tf_prefix_val}camera_rgb_optical_frame" if tf_prefix_val else "camera_rgb_optical_frame",
+                'map_frame': f"{tf_prefix_val}map" if tf_prefix_val else "map",
             }
         ],
         output='screen',
@@ -58,6 +62,12 @@ def generate_launch_description():
         actions=[aruco_node]
     )
 
+    return [
+        real_nav_launch,
+        delayed_aruco_node
+    ]
+
+def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(
             'use_sim_time',
@@ -85,6 +95,6 @@ def generate_launch_description():
             description='SLAM method: "toolbox" or "rtabmap"'
         ),
 
-        real_nav_launch,
-        delayed_aruco_node
+        OpaqueFunction(function=launch_setup)
     ])
+

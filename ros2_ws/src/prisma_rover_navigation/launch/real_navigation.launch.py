@@ -1,17 +1,17 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 from launch.substitutions import LaunchConfiguration
 
-def generate_launch_description():
+def launch_setup(context, *args, **kwargs):
     # Retrieve package share directories
     pkg_bringup_share = get_package_share_directory('prisma_rover_bringup')
     pkg_navigation_share = get_package_share_directory('prisma_rover_navigation')
 
-    # Launch configurations
+    # Evaluate launch configurations
     use_sim_time = LaunchConfiguration('use_sim_time')
     namespace = LaunchConfiguration('namespace')
     tf_prefix = LaunchConfiguration('tf_prefix')
@@ -19,6 +19,10 @@ def generate_launch_description():
     lidar_type = LaunchConfiguration('lidar_type')
     slam_type = LaunchConfiguration('slam_type')
     rviz = LaunchConfiguration('rviz')
+
+    namespace_val = context.perform_substitution(namespace)
+    tf_prefix_val = context.perform_substitution(tf_prefix)
+    use_sim_time_val = context.perform_substitution(use_sim_time).lower() == 'true'
 
     # 1. Hardware Bringup (Motor drivers, EKF, Sensors)
     hardware_launch = IncludeLaunchDescription(
@@ -56,16 +60,24 @@ def generate_launch_description():
         package='prisma_rover_description',
         executable='tf_to_pose_node',
         name='tf_to_pose',
-        namespace=namespace,
+        namespace=namespace_val,
         output='screen',
         parameters=[{
-            'map_frame': [tf_prefix, 'map'],
-            'base_frame': [tf_prefix, 'base_footprint'],
+            'map_frame': f"{tf_prefix_val}map" if tf_prefix_val else "map",
+            'base_frame': f"{tf_prefix_val}base_footprint" if tf_prefix_val else "base_footprint",
             'pose_topic': 'pose',
-            'use_sim_time': use_sim_time
+            'use_sim_time': use_sim_time_val
         }]
     )
 
+    return [
+        hardware_launch,
+        slam_launch,
+        navigation_launch,
+        tf_to_pose_node
+    ]
+
+def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(
             'use_sim_time',
@@ -103,8 +115,6 @@ def generate_launch_description():
             description='Whether to launch RViz2'
         ),
 
-        hardware_launch,
-        slam_launch,
-        navigation_launch,
-        tf_to_pose_node
+        OpaqueFunction(function=launch_setup)
     ])
+

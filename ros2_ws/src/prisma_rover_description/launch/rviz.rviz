@@ -77,7 +77,7 @@ Visualization Manager:
         Inertia: false
         Mass: false
       Name: RobotModel
-      TF Prefix: ""
+      TF Prefix: "prisma_rover"
       Update Interval: 0
       Value: true
       Visual Enabled: true
